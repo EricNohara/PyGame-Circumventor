@@ -2,7 +2,8 @@ import pygame
 
 # Setup
 pygame.init()   #initialize pygame
-screen = pygame.display.set_mode((1280, 720))   #set the screen to these dimensions
+size = width, height = 1280, 720
+screen = pygame.display.set_mode(size)   #set the screen to these dimensions
 clock = pygame.time.Clock()     #set the clock to the pygame clock
 running = True      # set the state of the game running to true
 dt = 0.05
@@ -21,15 +22,29 @@ while (running):
 
     # GAME RENDERING HERE
     # How to draw shapes:
-    pygame.draw.circle(screen, "red", player_pos, 40)
+    circle = pygame.draw.circle(screen, "red", player_pos, 40)
 
     #How to get key inputs:
     keys = pygame.key.get_pressed()
 
+    
+    # if circle.right > width:
+    #     player_pos.x = width
+    # if circle.top < 0:
+    #     player_pos.y = 0
+    # if circle.bottom > height:
+    #     player_pos.y = height
+
     if keys[pygame.K_w]:
-        player_pos.y -= 300 * dt
+        if circle.bottom > height:
+            player_pos.y = height
+        else:
+            player_pos.y -= 300 * dt
     elif keys[pygame.K_UP]:
-        player_pos.y -= 300 * dt
+        if circle.bottom > height:
+            player_pos.y = height
+        else:
+            player_pos.y -= 300 * dt
     if keys[pygame.K_s]:
         player_pos.y += 300 * dt
     elif keys[pygame.K_DOWN]:
@@ -42,6 +57,9 @@ while (running):
         player_pos.x += 300 * dt
     elif keys[pygame.K_RIGHT]:
         player_pos.x += 300 * dt
+
+    
+    
     
     # Display work on screen
     pygame.display.flip()
