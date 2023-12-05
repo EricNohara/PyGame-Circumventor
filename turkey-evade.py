@@ -34,16 +34,23 @@ class Player(object):
    
     def handle_keys(self):
         keys = pg.key.get_pressed()
-        move = 10 if keys[pg.K_LSHIFT] else 5
+        move = 12 if keys[pg.K_LSHIFT] else 6
         if keys[pg.K_UP] or keys[pg.K_w]:
             self.rect.y -= move
+        if self.rect.y < 0:
+            self.rect.y = 0
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.rect.y += move
+        if self.rect.y > (HEIGHT - self.rect.h):
+            self.rect.y = HEIGHT - self.rect.h
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.rect.x -= move
+        if self.rect.x < 0:
+            self.rect.x = 0
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.rect.x += move
-
+        if self.rect.x > (WIDTH - self.rect.w):
+            self.rect.x = WIDTH - self.rect.w
         
 
 ####################################################################################################################
