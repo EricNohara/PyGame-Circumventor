@@ -140,49 +140,17 @@ def settings():
 def scores():
     pass
 
-def game_over():
-    pg.display.set_caption("Game Over")
+def menu_screen(type):
+    play_or_restart = "PLAY" if type == "Main Menu" else "RESTART"
+    pg.display.set_caption(type)
     while True:
         screen.fill("grey")
         MOUSE_POS = pg.mouse.get_pos()
-        header = header_font.render("Game Over", True, "black")
+        header = header_font.render(type, True, "black")
         header_rect = header.get_rect()
         screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
 
-        PLAY_AGAIN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input="RESTART", font=font, base_color="grey", hovering_color="white")
-        SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
-        SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SCORES", font=font, base_color="grey", hovering_color="white")
-        QUIT_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 160), text_input="QUIT", font=font, base_color="grey", hovering_color="white")
-
-        for button in [PLAY_AGAIN_BTN, SETTINGS_BTN, SCORES_BTN, QUIT_BTN]:
-            button.changeColor(MOUSE_POS)
-            button.update(screen)
-
-        for event in pg.event.get():
-            check_exit_pygame(event)
-            if event.type == pg.MOUSEBUTTONDOWN:
-                if PLAY_AGAIN_BTN.checkForInput(MOUSE_POS):
-                    play()
-                if SETTINGS_BTN.checkForInput(MOUSE_POS):
-                    settings()
-                if SCORES_BTN.checkForInput(MOUSE_POS):
-                    scores()
-                if QUIT_BTN.checkForInput(MOUSE_POS):
-                    pg.quit()
-                    sys.exit()
-
-        pg.display.flip()
-
-def main_menu():
-    pg.display.set_caption("Main Menu")
-    while True:
-        screen.fill("grey")
-        MOUSE_POS = pg.mouse.get_pos()
-        header = header_font.render("Main Menu", True, "black")
-        header_rect = header.get_rect()
-        screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
-
-        PLAY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input="PLAY", font=font, base_color="grey", hovering_color="white")
+        PLAY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input=play_or_restart, font=font, base_color="grey", hovering_color="white")
         SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
         SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SCORES", font=font, base_color="grey", hovering_color="white")
         QUIT_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 160), text_input="QUIT", font=font, base_color="grey", hovering_color="white")
@@ -205,5 +173,11 @@ def main_menu():
                     sys.exit()
 
         pg.display.flip()
+
+def game_over():
+    menu_screen("Game Over")
+
+def main_menu():
+    menu_screen("Main Menu")
 
 main_menu()
