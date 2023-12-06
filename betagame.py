@@ -6,26 +6,28 @@ pg.init()
 SIZE = (WIDTH, HEIGHT) = (1280, 720)
 screen = pg.display.set_mode(SIZE)
 clock = pg.time.Clock()     #set the clock to the pygame clock
+CURRENT_SCREEN = "Main Menu"
+
 projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
+player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 score = 0
+
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
-player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 ###################################################################################################################
 # HELPER FUNCTIONS
 ###################################################################################################################
 
-def check_exit_pygame():
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
+def check_exit_pygame(event):
+    if event.type == pg.QUIT:
+        pg.quit()
+        sys.exit()
+    elif event.type == pg.KEYDOWN:
+        if event.key == pg.K_ESCAPE:
             pg.quit()
             sys.exit()
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                pg.quit()
-                sys.exit()
             
 def handle_movement(player):
     keys = pg.key.get_pressed()
@@ -93,6 +95,12 @@ def generate_hazards():
     
     return [circle_left, circle_right, circle_top, circle_bottom]
 
+def reset_game():
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score
+    projectile_left = projectile_right = projectile_top = projectile_bottom = False
+    player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    score = 0
+
 ###################################################################################################################
 # GAME LOOP
 ###################################################################################################################
@@ -100,7 +108,8 @@ def generate_hazards():
 def play():
     pg.display.set_caption("Play Game")
     while True:
-        check_exit_pygame()
+        for event in pg.event.get():
+            check_exit_pygame(event)
 
         screen.fill("grey")
 
@@ -114,20 +123,22 @@ def play():
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
-            global score
-            score = 0
+            reset_game()
             game_over()
-            break
 
         text = font.render("Score {0}".format(score), True, "black")
         text_rect = text.get_rect()
         screen.blit(text, ((WIDTH - text_rect.w)/2,20))
         
         # Display work on screen
-        pg.display.flip()
-
-        # Set the FPS to 60FPS
+        pg.display.flip()     
         clock.tick(60)
+ 
+def settings():
+    pass
+
+def scores():
+    pass
 
 def game_over():
     pg.display.set_caption("Game Over")
@@ -147,8 +158,52 @@ def game_over():
             button.changeColor(MOUSE_POS)
             button.update(screen)
 
-        check_exit_pygame()
+        for event in pg.event.get():
+            check_exit_pygame(event)
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if PLAY_AGAIN_BTN.checkForInput(MOUSE_POS):
+                    play()
+                if SETTINGS_BTN.checkForInput(MOUSE_POS):
+                    settings()
+                if SCORES_BTN.checkForInput(MOUSE_POS):
+                    scores()
+                if QUIT_BTN.checkForInput(MOUSE_POS):
+                    pg.quit()
+                    sys.exit()
 
         pg.display.flip()
 
-play()
+def main_menu():
+    pg.display.set_caption("Main Menu")
+    while True:
+        screen.fill("grey")
+        MOUSE_POS = pg.mouse.get_pos()
+        header = header_font.render("Main Menu", True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
+
+        PLAY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input="PLAY", font=font, base_color="grey", hovering_color="white")
+        SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
+        SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SCORES", font=font, base_color="grey", hovering_color="white")
+        QUIT_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 160), text_input="QUIT", font=font, base_color="grey", hovering_color="white")
+
+        for button in [PLAY_BTN, SETTINGS_BTN, SCORES_BTN, QUIT_BTN]:
+            button.changeColor(MOUSE_POS)
+            button.update(screen)
+
+        for event in pg.event.get():
+            check_exit_pygame(event)
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if PLAY_BTN.checkForInput(MOUSE_POS):
+                    play()
+                if SETTINGS_BTN.checkForInput(MOUSE_POS):
+                    settings()
+                if SCORES_BTN.checkForInput(MOUSE_POS):
+                    scores()
+                if QUIT_BTN.checkForInput(MOUSE_POS):
+                    pg.quit()
+                    sys.exit()
+
+        pg.display.flip()
+
+main_menu()
