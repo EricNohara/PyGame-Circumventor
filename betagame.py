@@ -10,6 +10,7 @@ projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 score = 0
 font = pg.font.Font('freesansbold.ttf', 30)
+header_font = pg.font.Font('freesansbold.ttf', 60)
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 ###################################################################################################################
@@ -132,9 +133,19 @@ def game_over():
     pg.display.set_caption("Game Over")
     while True:
         screen.fill("grey")
-        text = font.render("Game Over", True, "black")
-        text_rect = text.get_rect()
-        screen.blit(text, ((WIDTH-text_rect.w)/2, (HEIGHT-text_rect.h)/2))
+        MOUSE_POS = pg.mouse.get_pos()
+        header = header_font.render("Game Over", True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
+
+        PLAY_AGAIN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input="RESTART", font=font, base_color="grey", hovering_color="white")
+        SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
+        SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SCORES", font=font, base_color="grey", hovering_color="white")
+        QUIT_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 160), text_input="QUIT", font=font, base_color="grey", hovering_color="white")
+
+        for button in [PLAY_AGAIN_BTN, SETTINGS_BTN, SCORES_BTN, QUIT_BTN]:
+            button.changeColor(MOUSE_POS)
+            button.update(screen)
 
         check_exit_pygame()
 
