@@ -161,7 +161,10 @@ def menu_screen(type):
 
         for event in pg.event.get():
             check_exit_pygame(event)
-            if event.type == pg.MOUSEBUTTONDOWN:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    play()
+            elif event.type == pg.MOUSEBUTTONDOWN:
                 if PLAY_BTN.checkForInput(MOUSE_POS):
                     play()
                 if SETTINGS_BTN.checkForInput(MOUSE_POS):
