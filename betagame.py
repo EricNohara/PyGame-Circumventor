@@ -1,4 +1,5 @@
 import random, pygame as pg, sys
+from button import Button
 
 pg.init()
 
@@ -9,25 +10,26 @@ projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 score = 0
 font = pg.font.Font('freesansbold.ttf', 30)
-
-colors = (
-    pg.Color("red"), pg.Color("yellow"), pg.Color("blue"),
-    pg.Color("cyan"), pg.Color("green"), pg.Color("purple")
-)
-
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 ###################################################################################################################
 # HELPER FUNCTIONS
 ###################################################################################################################
 
+def check_exit_pygame():
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit()
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                pg.quit()
+                sys.exit()
+            
 def handle_movement(player):
     keys = pg.key.get_pressed()
     move = 15 if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT] else 10
 
-    if keys[pg.K_ESCAPE]:
-        pg.quit()
-        sys.exit()
     if keys[pg.K_w] or keys[pg.K_UP]:
         player_pos.y -= move
     if keys[pg.K_s] or keys[pg.K_DOWN]:
@@ -95,11 +97,9 @@ def generate_hazards():
 ###################################################################################################################
 
 def play():
+    pg.display.set_caption("Play Game")
     while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:   # This is when a user clicks the x, stop the game loop by changing running to false
-                pg.quit()
-                sys.exit()
+        check_exit_pygame()
 
         screen.fill("grey")
 
@@ -107,7 +107,7 @@ def play():
 
         handle_movement(player)
 
-        # PROJECTILES
+        # HAZARDS
         hazards = generate_hazards()
 
         collide = player.collidelist(hazards)
@@ -115,14 +115,29 @@ def play():
         if not (collide == -1):
             global score
             score = 0
+            game_over()
+            break
 
         text = font.render("Score {0}".format(score), True, "black")
-        screen.blit(text, (WIDTH/2 - 20,20))
+        text_rect = text.get_rect()
+        screen.blit(text, ((WIDTH - text_rect.w)/2,20))
         
         # Display work on screen
         pg.display.flip()
 
         # Set the FPS to 60FPS
         clock.tick(60)
+
+def game_over():
+    pg.display.set_caption("Game Over")
+    while True:
+        screen.fill("grey")
+        text = font.render("Game Over", True, "black")
+        text_rect = text.get_rect()
+        screen.blit(text, ((WIDTH-text_rect.w)/2, (HEIGHT-text_rect.h)/2))
+
+        check_exit_pygame()
+
+        pg.display.flip()
 
 play()
