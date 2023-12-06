@@ -45,6 +45,51 @@ def handle_movement(player):
     if player.right > WIDTH:
         player_pos.x = WIDTH - player.w   
 
+def generate_hazards():
+    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos
+    if projectile_left == False:
+        score += 1
+        projectile_left_pos = (0,random.randint(0, HEIGHT))
+        circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
+        projectile_left = True
+    elif projectile_left == True:
+        projectile_left_pos = (projectile_left_pos[0] + (WIDTH/100), projectile_left_pos[1])
+        circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
+        if projectile_left_pos[0] > WIDTH:
+            projectile_left = False
+    
+    if projectile_right == False:
+        projectile_right_pos = (WIDTH,random.randint(0, HEIGHT))
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        projectile_right = True
+    elif projectile_right == True:
+        projectile_right_pos = (projectile_right_pos[0] - (WIDTH/100), projectile_right_pos[1])
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        if projectile_right_pos[0] < 0:
+            projectile_right = False
+
+    if projectile_top == False:
+        projectile_top_pos = (random.randint(0, WIDTH),0)
+        circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
+        projectile_top = True
+    elif projectile_top == True:
+        projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+(HEIGHT/100))
+        circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
+        if projectile_top_pos[1] > HEIGHT:
+            projectile_top = False
+
+    if projectile_bottom == False:
+        projectile_bottom_pos = (random.randint(0, WIDTH),HEIGHT)
+        circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
+        projectile_bottom = True
+    elif projectile_bottom == True:
+        projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-(HEIGHT/100))
+        circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
+        if projectile_bottom_pos[1] < 0:
+            projectile_bottom = False
+    
+    return [circle_left, circle_right, circle_top, circle_bottom]
+
 ###################################################################################################################
 # GAME LOOP
 ###################################################################################################################
@@ -63,53 +108,12 @@ def play():
         handle_movement(player)
 
         # PROJECTILES
-        global score, projectile_left, projectile_right, projectile_top, projectile_bottom
-        if projectile_left == False:
-            score += 1
-            projectile_left_pos = (0,random.randint(0, HEIGHT))
-            circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
-            projectile_left = True
-        elif projectile_left == True:
-            projectile_left_pos = (projectile_left_pos[0] + (WIDTH/100), projectile_left_pos[1])
-            circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
-            if projectile_left_pos[0] > WIDTH:
-                projectile_left = False
-        
-        if projectile_right == False:
-            projectile_right_pos = (WIDTH,random.randint(0, HEIGHT))
-            circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
-            projectile_right = True
-        elif projectile_right == True:
-            projectile_right_pos = (projectile_right_pos[0] - (WIDTH/100), projectile_right_pos[1])
-            circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
-            if projectile_right_pos[0] < 0:
-                projectile_right = False
+        hazards = generate_hazards()
 
-        if projectile_top == False:
-            projectile_top_pos = (random.randint(0, WIDTH),0)
-            circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
-            projectile_top = True
-        elif projectile_top == True:
-            projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+(HEIGHT/100))
-            circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
-            if projectile_top_pos[1] > HEIGHT:
-                projectile_top = False
-
-        if projectile_bottom == False:
-            projectile_bottom_pos = (random.randint(0, WIDTH),HEIGHT)
-            circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
-            projectile_bottom = True
-        elif projectile_bottom == True:
-            projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-(HEIGHT/100))
-            circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
-            if projectile_bottom_pos[1] < 0:
-                projectile_bottom = False
-
-        collide = player.collidelist([circle_left, circle_right, circle_top, circle_bottom])
-
-        print(collide)
+        collide = player.collidelist(hazards)
 
         if not (collide == -1):
+            global score
             score = 0
 
         text = font.render("Score {0}".format(score), True, "black")
