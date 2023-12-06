@@ -20,14 +20,19 @@ header_font = pg.font.Font('freesansbold.ttf', 60)
 # HELPER FUNCTIONS
 ###################################################################################################################
 
-def check_exit_pygame(event):
+def check_exit_pygame_menu(event):
     if event.type == pg.QUIT:
         pg.quit()
         sys.exit()
     elif event.type == pg.KEYDOWN:
         if event.key == pg.K_ESCAPE:
             pg.quit()
-            sys.exit()
+            sys.exit()   
+
+def check_exit(event):
+    if event.type == pg.QUIT:
+        pg.quit()
+        sys.exit()
             
 def handle_movement(player):
     keys = pg.key.get_pressed()
@@ -110,7 +115,7 @@ def play():
     pg.display.set_caption("Play Game")
     while True:
         for event in pg.event.get():
-            check_exit_pygame(event)
+            check_exit(event)
 
         screen.fill("grey")
 
@@ -138,16 +143,35 @@ def play():
 def settings():
     pass
 
-def scores():
-    pass
-
-def menu_screen(type):
-    play_or_restart = "PLAY" if type == "Main Menu" else "RESTART"
-    pg.display.set_caption(type)
+def scores(return_menu_type):
+    pg.display.set_caption("Scores")
     while True:
         screen.fill("grey")
         MOUSE_POS = pg.mouse.get_pos()
-        header = header_font.render(type, True, "black")
+        header = header_font.render("Scores", True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
+
+        RETURN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.2), text_input="RETURN", font=font, base_color="grey", hovering_color="white")
+
+        RETURN_BTN.changeColor(MOUSE_POS)
+        RETURN_BTN.update(screen)
+
+        for event in pg.event.get():
+            check_exit(event)
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if RETURN_BTN.checkForInput(MOUSE_POS):
+                    menu_screen(return_menu_type)
+
+        pg.display.flip()
+
+def menu_screen(menu_type):
+    play_or_restart = "PLAY" if menu_type == "Main Menu" else "RESTART"
+    pg.display.set_caption(menu_type)
+    while True:
+        screen.fill("grey")
+        MOUSE_POS = pg.mouse.get_pos()
+        header = header_font.render(menu_type, True, "black")
         header_rect = header.get_rect()
         screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
 
@@ -161,7 +185,7 @@ def menu_screen(type):
             button.update(screen)
 
         for event in pg.event.get():
-            check_exit_pygame(event)
+            check_exit_pygame_menu(event)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     play()
@@ -171,7 +195,7 @@ def menu_screen(type):
                 if SETTINGS_BTN.checkForInput(MOUSE_POS):
                     settings()
                 if SCORES_BTN.checkForInput(MOUSE_POS):
-                    scores()
+                    scores(menu_type)
                 if QUIT_BTN.checkForInput(MOUSE_POS):
                     pg.quit()
                     sys.exit()
