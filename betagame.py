@@ -11,7 +11,7 @@ CURRENT_SCREEN = "Main Menu"
 projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-score = 0
+score = -2
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -74,22 +74,23 @@ def generate_hazards():
             projectile_right = False
 
     if projectile_top == False:
+        score += 1
         projectile_top_pos = (random.randint(0, WIDTH),0)
-        circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
+        circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
         projectile_top = True
     elif projectile_top == True:
         projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+(HEIGHT/100))
-        circle_top = pg.draw.circle(screen, "blue", projectile_top_pos, projectile_radius)
+        circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
         if projectile_top_pos[1] > HEIGHT:
             projectile_top = False
 
     if projectile_bottom == False:
         projectile_bottom_pos = (random.randint(0, WIDTH),HEIGHT)
-        circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
+        circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         projectile_bottom = True
     elif projectile_bottom == True:
         projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-(HEIGHT/100))
-        circle_bottom = pg.draw.circle(screen, "blue", projectile_bottom_pos, projectile_radius)
+        circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         if projectile_bottom_pos[1] < 0:
             projectile_bottom = False
     
@@ -99,7 +100,7 @@ def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-    score = 0
+    score = -2
 
 ###################################################################################################################
 # GAME LOOP
