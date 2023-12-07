@@ -304,14 +304,7 @@ def settings(return_menu_type):
 def player_win(player_num):
     pg.display.set_caption("Win Screen")
     while True:
-        for event in pg.event.get():
-            check_exit(event)
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
-                    play()
-                if event.key == pg.K_ESCAPE:
-                    main_menu()
-
+        MOUSE_POS = pg.mouse.get_pos()
         reset_game()
         screen.fill("grey")
         if player_num != -1:
@@ -320,6 +313,26 @@ def player_win(player_num):
             header = header_font.render("Tie Game, Play Again!", True, "black")
         header_rect = header.get_rect()
         screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
+
+        PLAY_AGAIN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2 - 160, HEIGHT/1.2), text_input="PLAY AGAIN", font=font, base_color="grey", hovering_color="white")
+        MENU_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2 + 160, HEIGHT/1.2), text_input="MAIN MENU", font=font, base_color="grey", hovering_color="white")
+
+        for btn in [PLAY_AGAIN_BTN, MENU_BTN]:
+            btn.changeColor(MOUSE_POS)
+            btn.update(screen)
+
+        for event in pg.event.get():
+            check_exit(event)
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    play()
+                if event.key == pg.K_ESCAPE:
+                    main_menu()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if PLAY_AGAIN_BTN.checkForInput(MOUSE_POS):
+                    play()
+                if MENU_BTN.checkForInput(MOUSE_POS):
+                    main_menu()
 
         pg.display.flip()
 
