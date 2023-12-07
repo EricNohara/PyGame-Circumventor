@@ -193,10 +193,6 @@ def play():
                 SCORES.sort()
                 reset_game()
                 game_over()
-
-            text = font.render("Score {0}".format(score), True, "black")
-            text_rect = text.get_rect()
-            screen.blit(text, ((WIDTH - text_rect.w)/2,20))
         else:
             global player1_alive, player2_alive
             if player1_alive:
@@ -218,6 +214,11 @@ def play():
                 SCORES.sort()
                 reset_game()
                 game_over()
+
+        # Handle scores
+        text = font.render("Score {0}".format(score), True, "black")
+        text_rect = text.get_rect()
+        screen.blit(text, ((WIDTH - text_rect.w)/2,20))
             
         # Display work on screen
         pg.display.flip()     
