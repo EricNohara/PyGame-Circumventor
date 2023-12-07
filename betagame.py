@@ -100,7 +100,6 @@ def handle_movement(player = None, player1 = None, player2 = None):
         if player2.right > WIDTH:
             player2_pos.x = WIDTH - player2.w
 
-
 def generate_hazards():
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
     projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
@@ -151,9 +150,13 @@ def generate_hazards():
     return [circle_left, circle_right, circle_top, circle_bottom]
 
 def reset_game():
-    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
-    player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    if NUM_PLAYERS == 1:
+        player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    else:
+        player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
+        player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
     score = -2
 
 ###################################################################################################################
@@ -190,6 +193,15 @@ def play():
             player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
             handle_movement(None, player1, player2)
             
+            hazards = generate_hazards()
+            collide_player1 = player1.collidelist(hazards)
+            collide_player2 = player2.collidelist(hazards)
+
+            if not (collide_player1 == -1 and collide_player2 == -1):
+                SCORES.append(score)
+                SCORES.sort()
+                reset_game()
+                game_over()
             
         # Display work on screen
         pg.display.flip()     
