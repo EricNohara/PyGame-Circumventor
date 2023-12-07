@@ -10,6 +10,8 @@ CURRENT_SCREEN = "Main Menu"
 
 projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
+projectile_X_init_speed = WIDTH/100
+projectile_Y_init_speed = HEIGHT/100
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 score = -2
 SCORES = [0,0,0,0,0]
@@ -59,15 +61,17 @@ def handle_movement(player):
         player_pos.x = WIDTH - player.w   
 
 def generate_hazards():
-    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius
+    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
     projectile_radius = 30 if GAMEMODE == "Medium" else 20 if GAMEMODE == "Easy" else 35
+    projectile_X_init_speed = WIDTH/100 if GAMEMODE == "Medium" else WIDTH/150 if GAMEMODE == "Easy" else WIDTH/75
+    projectile_Y_init_speed = HEIGHT/100 if GAMEMODE == "Medium" else HEIGHT/150 if GAMEMODE == "Easy" else HEIGHT/75
     if projectile_left == False:
         score += 1
         projectile_left_pos = (0,random.randint(0, HEIGHT))
         circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
         projectile_left = True
     elif projectile_left == True:
-        projectile_left_pos = (projectile_left_pos[0] + (WIDTH/100), projectile_left_pos[1])
+        projectile_left_pos = (projectile_left_pos[0] + projectile_X_init_speed, projectile_left_pos[1])
         circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
         if projectile_left_pos[0] > WIDTH:
             projectile_left = False
@@ -77,7 +81,7 @@ def generate_hazards():
         circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
         projectile_right = True
     elif projectile_right == True:
-        projectile_right_pos = (projectile_right_pos[0] - (WIDTH/100), projectile_right_pos[1])
+        projectile_right_pos = (projectile_right_pos[0] - projectile_X_init_speed, projectile_right_pos[1])
         circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
         if projectile_right_pos[0] < 0:
             projectile_right = False
@@ -88,7 +92,7 @@ def generate_hazards():
         circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
         projectile_top = True
     elif projectile_top == True:
-        projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+(HEIGHT/100))
+        projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+projectile_Y_init_speed)
         circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
         if projectile_top_pos[1] > HEIGHT:
             projectile_top = False
@@ -98,7 +102,7 @@ def generate_hazards():
         circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         projectile_bottom = True
     elif projectile_bottom == True:
-        projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-(HEIGHT/100))
+        projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-projectile_Y_init_speed)
         circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         if projectile_bottom_pos[1] < 0:
             projectile_bottom = False
