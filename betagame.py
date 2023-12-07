@@ -22,7 +22,7 @@ MUTED = False
 DIFFICULTY_SETTING = "Medium"
 
 # For 2 player mode
-NUM_PLAYERS = 1
+NUM_PLAYERS = "1-Player"
 player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
 player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
 player1_alive = True
@@ -52,7 +52,7 @@ def check_exit(event):
 def handle_movement(player = None, player1 = None, player2 = None):
     keys = pg.key.get_pressed()
 
-    if NUM_PLAYERS == 1:
+    if NUM_PLAYERS == "1-Player":
         move = 15 if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT] else 10
         if keys[pg.K_w] or keys[pg.K_UP]:
             player_pos.y -= move
@@ -159,7 +159,7 @@ def generate_hazards():
 def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
-    if NUM_PLAYERS == 1:
+    if NUM_PLAYERS == "1-Player":
         player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     else:
         player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
@@ -180,7 +180,7 @@ def play():
 
         screen.fill("grey")
 
-        if NUM_PLAYERS == 1:
+        if NUM_PLAYERS == "1-Player":
             player = pg.draw.circle(screen, "red", player_pos, 40)
             handle_movement(player)
 
@@ -205,16 +205,23 @@ def play():
             collide_player1 = player1.collidelist(hazards)
             collide_player2 = player2.collidelist(hazards)
 
-            if collide_player1 != -1:
-                player1_alive = False
-            if collide_player2 != -1:
-                player2_alive = False
-            if player1_alive == False and player2_alive == False:
-                SCORES.append(score)
-                SCORES.sort()
-                reset_game()
-                game_over()
-
+            if NUM_PLAYERS == "2-Player":
+                if collide_player1 != -1:
+                    player1_alive = False
+                if collide_player2 != -1:
+                    player2_alive = False
+                if player1_alive == False and player2_alive == False:
+                    SCORES.append(score)
+                    SCORES.sort()
+                    reset_game()
+                    game_over()
+            else:
+                if collide_player1 != -1 and collide_player2 == -1:
+                    player_win(2)
+                if collide_player1 == -1 and collide_player2 != -1:
+                    player_win(1)
+                if collide_player1 != -1 and collide_player2 != -1:
+                    player_win(-1)
         # Handle scores
         text = font.render("Score {0}".format(score), True, "black")
         text_rect = text.get_rect()
@@ -223,7 +230,6 @@ def play():
         # Display work on screen
         pg.display.flip()     
         clock.tick(60)
-        print(player1_alive, player2_alive)
  
 def settings(return_menu_type):
     global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS
@@ -256,8 +262,10 @@ def settings(return_menu_type):
                 else:
                     DIFFICULTY_BTN.update_text("MEDIUM")
             elif btn == PLAYER_NUM_BTN:
-                if NUM_PLAYERS == 2:
+                if NUM_PLAYERS == "2-Player":
                     PLAYER_NUM_BTN.update_text("2-PLAYER")
+                elif NUM_PLAYERS == "Versus":
+                    PLAYER_NUM_BTN.update_text("1 VS 2")
                 else:
                     PLAYER_NUM_BTN.update_text("1-PLAYER")
             btn.changeColor(MOUSE_POS)
@@ -272,10 +280,12 @@ def settings(return_menu_type):
                 if RETURN_BTN.checkForInput(MOUSE_POS):
                     menu_screen(return_menu_type)
                 if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
-                    if NUM_PLAYERS == 1:
-                        NUM_PLAYERS = 2
+                    if NUM_PLAYERS == "1-Player":
+                        NUM_PLAYERS = "2-Player"
+                    elif NUM_PLAYERS == "2-Player":
+                        NUM_PLAYERS = "Versus"
                     else:
-                        NUM_PLAYERS = 1
+                        NUM_PLAYERS = "1-Player"
                 if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
                     if DIFFICULTY_SETTING == "Medium":
                         DIFFICULTY_SETTING = "Hard"
@@ -288,6 +298,28 @@ def settings(return_menu_type):
                         MUTED = True
                     else:
                         MUTED = False
+
+        pg.display.flip()
+
+def player_win(player_num):
+    pg.display.set_caption("Win Screen")
+    while True:
+        for event in pg.event.get():
+            check_exit(event)
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    play()
+                if event.key == pg.K_ESCAPE:
+                    main_menu()
+
+        reset_game()
+        screen.fill("grey")
+        if player_num != -1:
+            header = header_font.render("Player {} Wins!".format(player_num), True, "black")
+        else:
+            header = header_font.render("Tie Game, Play Again!", True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
 
         pg.display.flip()
 
