@@ -17,6 +17,7 @@ score = -2
 SCORES = [0,0,0,0,0]
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
+NUM_PLAYERS = 1
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -151,7 +152,7 @@ def play():
         clock.tick(60)
  
 def settings(return_menu_type):
-    global MUTED, DIFFICULTY_SETTING
+    global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS
     pg.display.set_caption("Settings")
     while True:
         screen.fill("grey")
@@ -180,6 +181,11 @@ def settings(return_menu_type):
                     DIFFICULTY_BTN.update_text("EASY")
                 else:
                     DIFFICULTY_BTN.update_text("MEDIUM")
+            elif btn == PLAYER_NUM_BTN:
+                if NUM_PLAYERS == 2:
+                    PLAYER_NUM_BTN.update_text("2-PLAYER")
+                else:
+                    PLAYER_NUM_BTN.update_text("1-PLAYER")
             btn.changeColor(MOUSE_POS)
             btn.update(screen)
 
@@ -191,6 +197,11 @@ def settings(return_menu_type):
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if RETURN_BTN.checkForInput(MOUSE_POS):
                     menu_screen(return_menu_type)
+                if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
+                    if NUM_PLAYERS == 1:
+                        NUM_PLAYERS = 2
+                    else:
+                        NUM_PLAYERS = 1
                 if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
                     if DIFFICULTY_SETTING == "Medium":
                         DIFFICULTY_SETTING = "Hard"
