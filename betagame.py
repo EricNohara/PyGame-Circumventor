@@ -8,18 +8,25 @@ screen = pg.display.set_mode(SIZE)
 clock = pg.time.Clock()     #set the clock to the pygame clock
 CURRENT_SCREEN = "Main Menu"
 
+# Projectiles initial settings
 projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 projectile_X_init_speed = WIDTH/100
 projectile_Y_init_speed = HEIGHT/100
+
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
-player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
+
 score = -2
 SCORES = [0,0,0,0,0]
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
+
+# For 2 player mode
 NUM_PLAYERS = 1
+player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
+player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
+player1_alive = True
+player2_alive = True
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -150,13 +157,15 @@ def generate_hazards():
     return [circle_left, circle_right, circle_top, circle_bottom]
 
 def reset_game():
-    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     if NUM_PLAYERS == 1:
         player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     else:
         player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
         player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
+        player1_alive = True
+        player2_alive = True
     score = -2
 
 ###################################################################################################################
@@ -189,15 +198,22 @@ def play():
             text_rect = text.get_rect()
             screen.blit(text, ((WIDTH - text_rect.w)/2,20))
         else:
-            player1 = pg.draw.circle(screen, "red", player1_pos, 40)
-            player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
+            global player1_alive, player2_alive
+            if player1_alive:
+                player1 = pg.draw.circle(screen, "red", player1_pos, 40)
+            if player2_alive:
+                player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
             handle_movement(None, player1, player2)
             
             hazards = generate_hazards()
             collide_player1 = player1.collidelist(hazards)
             collide_player2 = player2.collidelist(hazards)
 
-            if not (collide_player1 == -1 and collide_player2 == -1):
+            if collide_player1 != -1:
+                player1_alive = False
+            if collide_player2 != -1:
+                player2_alive = False
+            if player1_alive == False and player2_alive == False:
                 SCORES.append(score)
                 SCORES.sort()
                 reset_game()
@@ -206,6 +222,7 @@ def play():
         # Display work on screen
         pg.display.flip()     
         clock.tick(60)
+        print(player1_alive, player2_alive)
  
 def settings(return_menu_type):
     global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS
