@@ -309,10 +309,15 @@ def player_win(player_num):
         screen.fill("grey")
         if player_num != -1:
             header = header_font.render("Player {} Wins!".format(player_num), True, "black")
+            img = pg.image.load("assets/trophy.png")
+            img = pg.transform.scale(img, (img.get_width()/3, img.get_height()/3))
         else:
             header = header_font.render("Tie Game, Play Again!", True, "black")
+            img = pg.image.load("assets/tie.png")
         header_rect = header.get_rect()
+        img_rect = img.get_rect()
         screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
+        screen.blit(img, ((WIDTH-img_rect.w)/2, HEIGHT/4.5))
 
         PLAY_AGAIN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2 - 160, HEIGHT/1.2), text_input="PLAY AGAIN", font=font, base_color="grey", hovering_color="white")
         MENU_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2 + 160, HEIGHT/1.2), text_input="MAIN MENU", font=font, base_color="grey", hovering_color="white")
