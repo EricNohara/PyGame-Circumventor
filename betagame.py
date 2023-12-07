@@ -13,6 +13,8 @@ projectile_radius = 30
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 score = -2
 SCORES = [0,0,0,0,0]
+MUTED = False
+GAMEMODE = "Medium"
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -57,7 +59,8 @@ def handle_movement(player):
         player_pos.x = WIDTH - player.w   
 
 def generate_hazards():
-    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos
+    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius
+    projectile_radius = 30 if GAMEMODE == "Medium" else 20 if GAMEMODE == "Easy" else 35
     if projectile_left == False:
         score += 1
         projectile_left_pos = (0,random.randint(0, HEIGHT))
@@ -143,8 +146,50 @@ def play():
         pg.display.flip()     
         clock.tick(60)
  
-def settings():
-    pass
+def settings(return_menu_type):
+    global MUTED, GAMEMODE
+    pg.display.set_caption("Settings")
+    while True:
+        screen.fill("grey")
+        MOUSE_POS = pg.mouse.get_pos()
+        header = header_font.render("Settings", True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
+
+        RETURN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.2), text_input="RETURN", font=font, base_color="grey", hovering_color="white")
+        EASY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3), text_input="EASY", font=font, base_color="grey", hovering_color="white")
+        MEDIUM_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 80), text_input="MEDIUM", font=font, base_color="grey", hovering_color="white")
+        HARD_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 160), text_input="HARD", font=font, base_color="grey", hovering_color="white")
+        MUTE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 240), text_input="MUTE", font=font, base_color="grey", hovering_color="white")
+        UNMUTE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 240), text_input="UNMUTE", font=font, base_color="grey", hovering_color="white")
+
+        for btn in [RETURN_BTN, EASY_BTN, MEDIUM_BTN, HARD_BTN, MUTE_BTN, UNMUTE_BTN]:
+            if btn == MUTE_BTN and MUTED == True or btn == UNMUTE_BTN and MUTED == False:
+                continue
+            btn.changeColor(MOUSE_POS)
+            btn.update(screen)
+
+        for event in pg.event.get():
+            check_exit(event)
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    menu_screen(return_menu_type)
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if RETURN_BTN.checkForInput(MOUSE_POS):
+                    menu_screen(return_menu_type)
+                if EASY_BTN.checkForInput(MOUSE_POS):
+                    GAMEMODE = "Easy"
+                if MEDIUM_BTN.checkForInput(MOUSE_POS):
+                    GAMEMODE = "Medium"
+                if HARD_BTN.checkForInput(MOUSE_POS):
+                    GAMEMODE = "Hard"
+                if MUTE_BTN.checkForInput(MOUSE_POS):
+                    if MUTED == False:
+                        MUTED = True
+                    else:
+                        MUTED = False
+
+        pg.display.flip()
 
 def scores(return_menu_type):
     pg.display.set_caption("Scores")
@@ -211,7 +256,7 @@ def menu_screen(menu_type):
                 if PLAY_BTN.checkForInput(MOUSE_POS):
                     play()
                 if SETTINGS_BTN.checkForInput(MOUSE_POS):
-                    settings()
+                    settings(menu_type)
                 if SCORES_BTN.checkForInput(MOUSE_POS):
                     scores(menu_type)
                 if QUIT_BTN.checkForInput(MOUSE_POS):
