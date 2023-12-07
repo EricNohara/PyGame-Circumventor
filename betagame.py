@@ -13,6 +13,8 @@ projectile_radius = 30
 projectile_X_init_speed = WIDTH/100
 projectile_Y_init_speed = HEIGHT/100
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
+player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
 score = -2
 SCORES = [0,0,0,0,0]
 MUTED = False
@@ -40,26 +42,64 @@ def check_exit(event):
         pg.quit()
         sys.exit()
             
-def handle_movement(player):
+def handle_movement(player = None, player1 = None, player2 = None):
     keys = pg.key.get_pressed()
-    move = 15 if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT] else 10
 
-    if keys[pg.K_w] or keys[pg.K_UP]:
-        player_pos.y -= move
-    if keys[pg.K_s] or keys[pg.K_DOWN]:
-        player_pos.y += move
-    if keys[pg.K_a] or keys[pg.K_LEFT]:
-        player_pos.x -= move
-    if keys[pg.K_d] or keys[pg.K_RIGHT]:
-        player_pos.x += move
-    if player.top < 0:
-        player_pos.y = 0
-    if player.bottom > HEIGHT:
-        player_pos.y = HEIGHT - player.h
-    if player.left < 0:
-        player_pos.x = 0
-    if player.right > WIDTH:
-        player_pos.x = WIDTH - player.w   
+    if NUM_PLAYERS == 1:
+        move = 15 if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT] else 10
+        if keys[pg.K_w] or keys[pg.K_UP]:
+            player_pos.y -= move
+        if keys[pg.K_s] or keys[pg.K_DOWN]:
+            player_pos.y += move
+        if keys[pg.K_a] or keys[pg.K_LEFT]:
+            player_pos.x -= move
+        if keys[pg.K_d] or keys[pg.K_RIGHT]:
+            player_pos.x += move
+        if player.top < 0:
+            player_pos.y = 0
+        if player.bottom > HEIGHT:
+            player_pos.y = HEIGHT - player.h
+        if player.left < 0:
+            player_pos.x = 0
+        if player.right > WIDTH:
+            player_pos.x = WIDTH - player.w
+    else:
+        move_player1 = 15 if keys[pg.K_LSHIFT] else 10
+        move_player2 = 15 if keys[pg.K_RSHIFT] else 10
+        if keys[pg.K_w]:
+            player1_pos.y -= move_player1
+        if keys[pg.K_s]:
+            player1_pos.y += move_player1
+        if keys[pg.K_a]:
+            player1_pos.x -= move_player1
+        if keys[pg.K_d]:
+            player1_pos.x += move_player1
+        if player1.top < 0:
+            player1_pos.y = 0
+        if player1.bottom > HEIGHT:
+            player1_pos.y = HEIGHT - player1.h
+        if player1.left < 0:
+            player1_pos.x = 0
+        if player1.right > WIDTH:
+            player1_pos.x = WIDTH - player1.w
+        # PLAYER 2
+        if keys[pg.K_UP]:
+            player2_pos.y -= move_player2
+        if keys[pg.K_DOWN]:
+            player2_pos.y += move_player2
+        if keys[pg.K_LEFT]:
+            player2_pos.x -= move_player2
+        if keys[pg.K_RIGHT]:
+            player2_pos.x += move_player2
+        if player2.top < 0:
+            player2_pos.y = 0
+        if player2.bottom > HEIGHT:
+            player2_pos.y = HEIGHT - player2.h
+        if player2.left < 0:
+            player2_pos.x = 0
+        if player2.right > WIDTH:
+            player2_pos.x = WIDTH - player2.w
+
 
 def generate_hazards():
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
@@ -128,25 +168,29 @@ def play():
 
         screen.fill("grey")
 
-        player = pg.draw.circle(screen, "red", player_pos, 40)
+        if NUM_PLAYERS == 1:
+            player = pg.draw.circle(screen, "red", player_pos, 40)
+            handle_movement(player)
 
-        handle_movement(player)
+            # HAZARDS
+            hazards = generate_hazards()
+            collide = player.collidelist(hazards)
 
-        # HAZARDS
-        hazards = generate_hazards()
+            if not (collide == -1):
+                SCORES.append(score)
+                SCORES.sort()
+                reset_game()
+                game_over()
 
-        collide = player.collidelist(hazards)
-
-        if not (collide == -1):
-            SCORES.append(score)
-            SCORES.sort()
-            reset_game()
-            game_over()
-
-        text = font.render("Score {0}".format(score), True, "black")
-        text_rect = text.get_rect()
-        screen.blit(text, ((WIDTH - text_rect.w)/2,20))
-        
+            text = font.render("Score {0}".format(score), True, "black")
+            text_rect = text.get_rect()
+            screen.blit(text, ((WIDTH - text_rect.w)/2,20))
+        else:
+            player1 = pg.draw.circle(screen, "red", player1_pos, 40)
+            player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
+            handle_movement(None, player1, player2)
+            
+            
         # Display work on screen
         pg.display.flip()     
         clock.tick(60)
