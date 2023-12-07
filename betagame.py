@@ -16,7 +16,7 @@ player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 score = -2
 SCORES = [0,0,0,0,0]
 MUTED = False
-GAMEMODE = "Medium"
+DIFFICULTY_SETTING = "Medium"
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -62,9 +62,9 @@ def handle_movement(player):
 
 def generate_hazards():
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
-    projectile_radius = 30 if GAMEMODE == "Medium" else 20 if GAMEMODE == "Easy" else 35
-    projectile_X_init_speed = WIDTH/100 if GAMEMODE == "Medium" else WIDTH/150 if GAMEMODE == "Easy" else WIDTH/75
-    projectile_Y_init_speed = HEIGHT/100 if GAMEMODE == "Medium" else HEIGHT/150 if GAMEMODE == "Easy" else HEIGHT/75
+    projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
+    projectile_X_init_speed = WIDTH/100 if DIFFICULTY_SETTING == "Medium" else WIDTH/150 if DIFFICULTY_SETTING == "Easy" else WIDTH/75
+    projectile_Y_init_speed = HEIGHT/100 if DIFFICULTY_SETTING == "Medium" else HEIGHT/150 if DIFFICULTY_SETTING == "Easy" else HEIGHT/75
     if projectile_left == False:
         score += 1
         projectile_left_pos = (0,random.randint(0, HEIGHT))
@@ -151,7 +151,7 @@ def play():
         clock.tick(60)
  
 def settings(return_menu_type):
-    global MUTED, GAMEMODE
+    global MUTED, DIFFICULTY_SETTING
     pg.display.set_caption("Settings")
     while True:
         screen.fill("grey")
@@ -160,33 +160,44 @@ def settings(return_menu_type):
         header_rect = header.get_rect()
         screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
 
-        RETURN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.2), text_input="RETURN", font=font, base_color="grey", hovering_color="white")
-        EASY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3), text_input="EASY", font=font, base_color="grey", hovering_color="white")
-        MEDIUM_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 80), text_input="MEDIUM", font=font, base_color="grey", hovering_color="white")
-        HARD_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 160), text_input="HARD", font=font, base_color="grey", hovering_color="white")
-        MUTE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 240), text_input="MUTE", font=font, base_color="grey", hovering_color="white")
-        UNMUTE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/3 + 240), text_input="UNMUTE", font=font, base_color="grey", hovering_color="white")
+        PLAYER_NUM_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.25 - 320), text_input="1-PLAYER", font=font, base_color="grey", hovering_color="white")
+        DIFFICULTY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.25 - 240), text_input="MEDIUM", font=font, base_color="grey", hovering_color="white")
+        GAMEMODE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.25 - 160), text_input="GAMEMODE", font=font, base_color="grey", hovering_color="white")
+        MUTE_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.25 - 80), text_input="MUTE", font=font, base_color="grey", hovering_color="white")
+        RETURN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.25), text_input="RETURN", font=font, base_color="grey", hovering_color="white")
 
-        for btn in [RETURN_BTN, EASY_BTN, MEDIUM_BTN, HARD_BTN, MUTE_BTN, UNMUTE_BTN]:
-            if btn == MUTE_BTN and MUTED == True or btn == UNMUTE_BTN and MUTED == False:
-                continue
+
+        for btn in [RETURN_BTN, DIFFICULTY_BTN, MUTE_BTN, PLAYER_NUM_BTN, GAMEMODE_BTN]:
+            if btn == MUTE_BTN:
+                if MUTED == True:
+                    MUTE_BTN.update_text("UNMUTE")
+                else:
+                    MUTE_BTN.update_text("MUTE")
+            elif btn == DIFFICULTY_BTN:
+                if DIFFICULTY_SETTING == "Hard":
+                    DIFFICULTY_BTN.update_text("HARD")
+                elif DIFFICULTY_SETTING == "Easy":
+                    DIFFICULTY_BTN.update_text("EASY")
+                else:
+                    DIFFICULTY_BTN.update_text("MEDIUM")
             btn.changeColor(MOUSE_POS)
             btn.update(screen)
 
         for event in pg.event.get():
             check_exit(event)
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
                     menu_screen(return_menu_type)
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if RETURN_BTN.checkForInput(MOUSE_POS):
                     menu_screen(return_menu_type)
-                if EASY_BTN.checkForInput(MOUSE_POS):
-                    GAMEMODE = "Easy"
-                if MEDIUM_BTN.checkForInput(MOUSE_POS):
-                    GAMEMODE = "Medium"
-                if HARD_BTN.checkForInput(MOUSE_POS):
-                    GAMEMODE = "Hard"
+                if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
+                    if DIFFICULTY_SETTING == "Medium":
+                        DIFFICULTY_SETTING = "Hard"
+                    elif DIFFICULTY_SETTING == "Hard":
+                        DIFFICULTY_SETTING = "Easy"
+                    else:
+                        DIFFICULTY_SETTING = "Medium"
                 if MUTE_BTN.checkForInput(MOUSE_POS):
                     if MUTED == False:
                         MUTED = True
