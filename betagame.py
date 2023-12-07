@@ -12,6 +12,7 @@ projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 score = -2
+SCORES = [0,0,0,0,0]
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -129,6 +130,8 @@ def play():
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
+            SCORES.append(score)
+            SCORES.sort()
             reset_game()
             game_over()
 
@@ -157,10 +160,25 @@ def scores(return_menu_type):
         RETURN_BTN.changeColor(MOUSE_POS)
         RETURN_BTN.update(screen)
 
+        score1 = font.render("1. {0}".format(SCORES[len(SCORES)-1]), True, "black")
+        score2 = font.render("2. {0}".format(SCORES[len(SCORES)-2]), True, "black")
+        score3 = font.render("3. {0}".format(SCORES[len(SCORES)-3]), True, "black")
+        score4 = font.render("4. {0}".format(SCORES[len(SCORES)-4]), True, "black")
+        score5 = font.render("5. {0}".format(SCORES[len(SCORES)-5]), True, "black")
+
+        y_pos = HEIGHT/3.5
+        for s in [score1, score2, score3, score4, score5]:
+            s_rect = s.get_rect()
+            screen.blit(s, ((WIDTH-s_rect.w)/2, y_pos))
+            y_pos += 70
+
         for event in pg.event.get():
             check_exit(event)
             if event.type == pg.MOUSEBUTTONDOWN:
                 if RETURN_BTN.checkForInput(MOUSE_POS):
+                    menu_screen(return_menu_type)
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
                     menu_screen(return_menu_type)
 
         pg.display.flip()
