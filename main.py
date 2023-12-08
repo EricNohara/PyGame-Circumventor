@@ -76,39 +76,41 @@ def handle_movement(player = None, player1 = None, player2 = None):
     else:
         move_player1 = 15 if keys[pg.K_LSHIFT] else 10
         move_player2 = 15 if keys[pg.K_RSHIFT] else 10
-        if keys[pg.K_w]:
-            player1_pos.y -= move_player1
-        if keys[pg.K_s]:
-            player1_pos.y += move_player1
-        if keys[pg.K_a]:
-            player1_pos.x -= move_player1
-        if keys[pg.K_d]:
-            player1_pos.x += move_player1
-        if player1.top < 0:
-            player1_pos.y = 0
-        if player1.bottom > HEIGHT:
-            player1_pos.y = HEIGHT - player1.h
-        if player1.left < 0:
-            player1_pos.x = 0
-        if player1.right > WIDTH:
-            player1_pos.x = WIDTH - player1.w
+        if player1 != None:
+            if keys[pg.K_w]:
+                player1_pos.y -= move_player1
+            if keys[pg.K_s]:
+                player1_pos.y += move_player1
+            if keys[pg.K_a]:
+                player1_pos.x -= move_player1
+            if keys[pg.K_d]:
+                player1_pos.x += move_player1
+            if player1.top < 0:
+                player1_pos.y = 0
+            if player1.bottom > HEIGHT:
+                player1_pos.y = HEIGHT - player1.h
+            if player1.left < 0:
+                player1_pos.x = 0
+            if player1.right > WIDTH:
+                player1_pos.x = WIDTH - player1.w
         # PLAYER 2
-        if keys[pg.K_UP]:
-            player2_pos.y -= move_player2
-        if keys[pg.K_DOWN]:
-            player2_pos.y += move_player2
-        if keys[pg.K_LEFT]:
-            player2_pos.x -= move_player2
-        if keys[pg.K_RIGHT]:
-            player2_pos.x += move_player2
-        if player2.top < 0:
-            player2_pos.y = 0
-        if player2.bottom > HEIGHT:
-            player2_pos.y = HEIGHT - player2.h
-        if player2.left < 0:
-            player2_pos.x = 0
-        if player2.right > WIDTH:
-            player2_pos.x = WIDTH - player2.w
+        if player2 != None:
+            if keys[pg.K_UP]:
+                player2_pos.y -= move_player2
+            if keys[pg.K_DOWN]:
+                player2_pos.y += move_player2
+            if keys[pg.K_LEFT]:
+                player2_pos.x -= move_player2
+            if keys[pg.K_RIGHT]:
+                player2_pos.x += move_player2
+            if player2.top < 0:
+                player2_pos.y = 0
+            if player2.bottom > HEIGHT:
+                player2_pos.y = HEIGHT - player2.h
+            if player2.left < 0:
+                player2_pos.x = 0
+            if player2.right > WIDTH:
+                player2_pos.x = WIDTH - player2.w
 
 def generate_hazards_classic():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
@@ -224,18 +226,54 @@ def reset_game():
     score = 0
 
 def classic_mode():
-    player = pg.draw.circle(screen, "red", player_pos, 40)
-    handle_movement(player)
+    if NUM_PLAYERS == "1-Player":
+        player = pg.draw.circle(screen, "red", player_pos, 40)
+        handle_movement(player)
 
-    # HAZARDS
-    hazards = generate_hazards_classic()
-    collide = player.collidelist(hazards)
+        # HAZARDS
+        hazards = generate_hazards_classic()
+        collide = player.collidelist(hazards)
 
-    if not (collide == -1):
-        SCORES.append(score)
-        SCORES.sort()
-        reset_game()
-        game_over()
+        if not (collide == -1):
+            SCORES.append(score)
+            SCORES.sort()
+            reset_game()
+            game_over()
+    else:
+        global player1_alive, player2_alive
+        player1 = None
+        player2 = None
+        if player1_alive:
+            player1 = pg.draw.circle(screen, "red", player1_pos, 40)
+        if player2_alive:
+            player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
+        handle_movement(None, player1, player2)
+        
+        hazards = generate_hazards_classic()
+
+        if player1_alive:
+            collide_player1 = player1.collidelist(hazards)
+        if player2_alive:
+            collide_player2 = player2.collidelist(hazards)
+
+        if NUM_PLAYERS == "2-Player" and GAMEMODE == "Classic":
+            if player1_alive and collide_player1 != -1:
+                player1_alive = False
+            if player2_alive and collide_player2 != -1:
+                player2_alive = False
+            if player1_alive == False and player2_alive == False:
+                SCORES.append(score)
+                SCORES.sort()
+                reset_game()
+                game_over()
+        elif NUM_PLAYERS == "VS" and GAMEMODE == "Classic":
+            if collide_player1 != -1 and collide_player2 == -1:
+                player_win(2)
+            if collide_player1 == -1 and collide_player2 != -1:
+                player_win(1)
+            if collide_player1 != -1 and collide_player2 != -1:
+                player_win(-1)
+
 
 def collect_mode(start_time):
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom
@@ -291,40 +329,11 @@ def play():
 
         screen.fill("grey")
 
-        if NUM_PLAYERS == "1-Player":
-            if GAMEMODE == "Classic":
-                classic_mode()
-            elif GAMEMODE == "Collect":
-                collect_mode(start_time)
-        elif NUM_PLAYERS == "2-Player" or NUM_PLAYERS == "VS":
-            global player1_alive, player2_alive
-            if player1_alive:
-                player1 = pg.draw.circle(screen, "red", player1_pos, 40)
-            if player2_alive:
-                player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
-            handle_movement(None, player1, player2)
+        if GAMEMODE == "Classic":
+            classic_mode()
+        elif GAMEMODE == "Collect":
+            collect_mode(start_time)
             
-            hazards = generate_hazards_classic()
-            collide_player1 = player1.collidelist(hazards)
-            collide_player2 = player2.collidelist(hazards)
-
-            if NUM_PLAYERS == "2-Player" and GAMEMODE == "Classic":
-                if collide_player1 != -1:
-                    player1_alive = False
-                if collide_player2 != -1:
-                    player2_alive = False
-                if player1_alive == False and player2_alive == False:
-                    SCORES.append(score)
-                    SCORES.sort()
-                    reset_game()
-                    game_over()
-            elif NUM_PLAYERS == "VS" and GAMEMODE == "Classic":
-                if collide_player1 != -1 and collide_player2 == -1:
-                    player_win(2)
-                if collide_player1 == -1 and collide_player2 != -1:
-                    player_win(1)
-                if collide_player1 != -1 and collide_player2 != -1:
-                    player_win(-1)
         # Handle scores
         text = font.render("Score {0}".format(score), True, "black")
         text_rect = text.get_rect()
