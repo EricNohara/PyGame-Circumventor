@@ -13,6 +13,8 @@ projectile_left = projectile_right = projectile_top = projectile_bottom = False
 projectile_radius = 30
 projectile_X_init_speed = WIDTH/100
 projectile_Y_init_speed = HEIGHT/100
+collect_projectile = False
+collect_projectile_axis = 1
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
@@ -109,7 +111,7 @@ def handle_movement(player = None, player1 = None, player2 = None):
             player2_pos.x = WIDTH - player2.w
 
 def generate_hazards_classic():
-    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
     projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
     projectile_X_init_speed = WIDTH/100 if DIFFICULTY_SETTING == "Medium" else WIDTH/150 if DIFFICULTY_SETTING == "Easy" else WIDTH/75
     projectile_Y_init_speed = HEIGHT/100 if DIFFICULTY_SETTING == "Medium" else HEIGHT/150 if DIFFICULTY_SETTING == "Easy" else HEIGHT/75
@@ -155,6 +157,61 @@ def generate_hazards_classic():
     
     return [circle_left, circle_right, circle_top, circle_bottom]
 
+def generate_collect_mode_hazard():
+    global collect_projectile, projectile_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed, collect_projectile_axis
+    projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
+    projectile_X_init_speed = WIDTH/100 if DIFFICULTY_SETTING == "Medium" else WIDTH/150 if DIFFICULTY_SETTING == "Easy" else WIDTH/75
+    projectile_Y_init_speed = HEIGHT/100 if DIFFICULTY_SETTING == "Medium" else HEIGHT/150 if DIFFICULTY_SETTING == "Easy" else HEIGHT/75
+    if collect_projectile == False:
+        collect_projectile_axis = random.randint(1,4)
+
+    if collect_projectile == False and collect_projectile_axis == 1:
+        projectile_pos = (0,random.randint(0, HEIGHT))
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        collect_projectile = True
+        print(collect_projectile)
+    elif collect_projectile == True and collect_projectile_axis == 1:
+        projectile_pos = (projectile_pos[0] + projectile_X_init_speed, projectile_pos[1])
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        if projectile_pos[0] > WIDTH:
+            collect_projectile = False
+    
+    if collect_projectile == False and collect_projectile_axis == 2:
+        projectile_pos = (WIDTH,random.randint(0, HEIGHT))
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        collect_projectile = True
+        print(collect_projectile)
+    elif collect_projectile == True and collect_projectile_axis == 2:
+        projectile_pos = (projectile_pos[0] - projectile_X_init_speed, projectile_pos[1])
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        if projectile_pos[0] < 0:
+            collect_projectile = False
+
+    if collect_projectile == False and collect_projectile_axis == 3:
+        projectile_pos = (random.randint(0, WIDTH),0)
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        collect_projectile = True
+        print(collect_projectile)
+    elif collect_projectile == True and collect_projectile_axis == 3:
+        projectile_pos = (projectile_pos[0], projectile_pos[1]+projectile_Y_init_speed)
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        if projectile_pos[1] > HEIGHT:
+            collect_projectile = False
+
+    if collect_projectile == False and collect_projectile_axis == 4:
+        projectile_pos = (random.randint(0, WIDTH),HEIGHT)
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        collect_projectile = True
+        print(collect_projectile)
+    elif collect_projectile == True and collect_projectile_axis == 4:
+        projectile_pos = (projectile_pos[0], projectile_pos[1]-projectile_Y_init_speed)
+        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        if projectile_pos[1] < 0:
+            collect_projectile = False
+    
+    return projectile_circle
+
+
 def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
@@ -181,19 +238,42 @@ def classic_mode():
         reset_game()
         game_over()
 
-def collect_mode():
+def collect_mode(start_time):
+    global score, projectile_left, projectile_right, projectile_top, projectile_bottom
     player = pg.draw.circle(screen, "red", player_pos, 40)
     handle_movement(player)
 
-    # HAZARDS
-    hazards = generate_hazards_classic()
-    collide = player.collidelist(hazards)
+    timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
+    timer_rect = timer.get_rect()
+    screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
 
-    if not (collide == -1):
+    # HAZARDS
+    haz_l, haz_r, haz_t, haz_b = generate_hazards_classic()
+    true_haz = generate_collect_mode_hazard()
+    collide1 = player.colliderect(haz_l)
+    collide2 = player.colliderect(haz_r)
+    collide3 = player.colliderect(haz_t)
+    collide4 = player.colliderect(haz_b)
+    collide_haz = player.colliderect(true_haz)
+
+    if collide1:
+        score += 1
+        projectile_left = False
+    if collide2:
+        score += 1
+        projectile_right = False
+    if collide3:
+        score += 1
+        projectile_top = False
+    if collide4:
+        score += 1
+        projectile_bottom = False
+
+    if 60 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
         SCORES.append(score)
         SCORES.sort()
         reset_game()
-        game_over()
+        game_over()   
 
 ###################################################################################################################
 # GAME LOOP
@@ -204,14 +284,19 @@ def play():
     global score
     pg.display.set_caption("Play Game")
     while True:
-        score = (pg.time.get_ticks() - start_time) // 1000
+        if GAMEMODE == "Classic":
+            score = (pg.time.get_ticks() - start_time) // 1000
+        
         for event in pg.event.get():
             check_exit(event)
 
         screen.fill("grey")
 
-        if NUM_PLAYERS == "1-Player" and GAMEMODE == "Classic":
-            classic_mode()
+        if NUM_PLAYERS == "1-Player":
+            if GAMEMODE == "Classic":
+                classic_mode()
+            elif GAMEMODE == "Collect":
+                collect_mode(start_time)
         elif NUM_PLAYERS == "2-Player" or NUM_PLAYERS == "VS":
             global player1_alive, player2_alive
             if player1_alive:
@@ -422,8 +507,8 @@ def menu_screen(menu_type):
         screen.blit(header, ((WIDTH-header_rect.w)/2, (HEIGHT-header_rect.h)/5))
 
         PLAY_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 - 80), text_input=play_or_restart, font=font, base_color="grey", hovering_color="white")
-        SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
-        SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SCORES", font=font, base_color="grey", hovering_color="white")
+        SCORES_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2), text_input="SCORES", font=font, base_color="grey", hovering_color="white")        
+        SETTINGS_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 80), text_input="SETTINGS", font=font, base_color="grey", hovering_color="white")
         QUIT_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/2 + 160), text_input="QUIT", font=font, base_color="grey", hovering_color="white")
 
         for button in [PLAY_BTN, SETTINGS_BTN, SCORES_BTN, QUIT_BTN]:
