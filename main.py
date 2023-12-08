@@ -169,7 +169,6 @@ def generate_collect_mode_hazard():
         projectile_pos = (0,random.randint(0, HEIGHT))
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
         collect_projectile = True
-        print(collect_projectile)
     elif collect_projectile == True and collect_projectile_axis == 1:
         projectile_pos = (projectile_pos[0] + projectile_X_init_speed, projectile_pos[1])
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
@@ -180,7 +179,6 @@ def generate_collect_mode_hazard():
         projectile_pos = (WIDTH,random.randint(0, HEIGHT))
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
         collect_projectile = True
-        print(collect_projectile)
     elif collect_projectile == True and collect_projectile_axis == 2:
         projectile_pos = (projectile_pos[0] - projectile_X_init_speed, projectile_pos[1])
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
@@ -191,7 +189,6 @@ def generate_collect_mode_hazard():
         projectile_pos = (random.randint(0, WIDTH),0)
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
         collect_projectile = True
-        print(collect_projectile)
     elif collect_projectile == True and collect_projectile_axis == 3:
         projectile_pos = (projectile_pos[0], projectile_pos[1]+projectile_Y_init_speed)
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
@@ -202,7 +199,6 @@ def generate_collect_mode_hazard():
         projectile_pos = (random.randint(0, WIDTH),HEIGHT)
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
         collect_projectile = True
-        print(collect_projectile)
     elif collect_projectile == True and collect_projectile_axis == 4:
         projectile_pos = (projectile_pos[0], projectile_pos[1]-projectile_Y_init_speed)
         projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
@@ -211,18 +207,21 @@ def generate_collect_mode_hazard():
     
     return projectile_circle
 
-
 def reset_game():
-    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     if NUM_PLAYERS == "1-Player":
+        if GAMEMODE == "Collect":
+            collect_projectile = False
         player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     else:
-        player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
-        player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
-        player1_alive = True
-        player2_alive = True
-    score = -2
+        if GAMEMODE == "Classic":
+            player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
+            player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
+            player1_alive = True
+            player2_alive = True
+
+    score = 0
 
 def classic_mode():
     player = pg.draw.circle(screen, "red", player_pos, 40)
