@@ -20,6 +20,7 @@ score = -2
 SCORES = [0,0,0,0,0]
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
+GAMEMODE = "Classic"
 
 # For 2 player mode
 NUM_PLAYERS = "1-Player"
@@ -232,7 +233,7 @@ def play():
         clock.tick(60)
  
 def settings(return_menu_type):
-    global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS
+    global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS, GAMEMODE
     pg.display.set_caption("Settings")
     while True:
         screen.fill("grey")
@@ -268,6 +269,13 @@ def settings(return_menu_type):
                     PLAYER_NUM_BTN.update_text("1 VS 2")
                 else:
                     PLAYER_NUM_BTN.update_text("1-PLAYER")
+            elif btn == GAMEMODE_BTN:
+                if GAMEMODE == "Classic":
+                    GAMEMODE_BTN.update_text("CLASSIC")
+                elif GAMEMODE == "Collect":
+                    GAMEMODE_BTN.update_text("COLLECT")
+                else:
+                    GAMEMODE_BTN.update_text("CHALLENGE")
             btn.changeColor(MOUSE_POS)
             btn.update(screen)
 
@@ -298,6 +306,13 @@ def settings(return_menu_type):
                         MUTED = True
                     else:
                         MUTED = False
+                if GAMEMODE_BTN.checkForInput(MOUSE_POS):
+                    if GAMEMODE == "Classic":
+                        GAMEMODE = "Collect"
+                    elif GAMEMODE == "Collect":
+                        GAMEMODE = "Challenge"
+                    else:
+                        GAMEMODE = "Classic"
 
         pg.display.flip()
 
