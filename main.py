@@ -217,12 +217,12 @@ def reset_game():
             collect_projectile = False
         player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     else:
-        if GAMEMODE == "Classic":
-            player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
-            player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
-            player1_alive = True
-            player2_alive = True
-
+        if GAMEMODE == "Collect":
+            collect_projectile = False
+        player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
+        player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
+        player1_alive = True
+        player2_alive = True
     score = 0
 
 def classic_mode():
@@ -256,17 +256,17 @@ def classic_mode():
         if player2_alive:
             collide_player2 = player2.collidelist(hazards)
 
-        if NUM_PLAYERS == "2-Player" and GAMEMODE == "Classic":
+        if NUM_PLAYERS == "2-Player":
             if player1_alive and collide_player1 != -1:
                 player1_alive = False
             if player2_alive and collide_player2 != -1:
                 player2_alive = False
-            if player1_alive == False and player2_alive == False:
+            if not (player1_alive or player2_alive):
                 SCORES.append(score)
                 SCORES.sort()
                 reset_game()
                 game_over()
-        elif NUM_PLAYERS == "VS" and GAMEMODE == "Classic":
+        elif NUM_PLAYERS == "VS":
             if collide_player1 != -1 and collide_player2 == -1:
                 player_win(2)
             if collide_player1 == -1 and collide_player2 != -1:
@@ -277,40 +277,93 @@ def classic_mode():
 
 def collect_mode(start_time):
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom
-    player = pg.draw.circle(screen, "red", player_pos, 40)
-    handle_movement(player)
+    if NUM_PLAYERS == "1-Player":
+        player = pg.draw.circle(screen, "red", player_pos, 40)
+        handle_movement(player)
 
-    timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
-    timer_rect = timer.get_rect()
-    screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
+        timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
+        timer_rect = timer.get_rect()
+        screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
 
-    # HAZARDS
-    haz_l, haz_r, haz_t, haz_b = generate_hazards_classic()
-    true_haz = generate_collect_mode_hazard()
-    collide1 = player.colliderect(haz_l)
-    collide2 = player.colliderect(haz_r)
-    collide3 = player.colliderect(haz_t)
-    collide4 = player.colliderect(haz_b)
-    collide_haz = player.colliderect(true_haz)
+        # HAZARDS
+        haz_l, haz_r, haz_t, haz_b = generate_hazards_classic()
+        true_haz = generate_collect_mode_hazard()
+        collide1 = player.colliderect(haz_l)
+        collide2 = player.colliderect(haz_r)
+        collide3 = player.colliderect(haz_t)
+        collide4 = player.colliderect(haz_b)
+        collide_haz = player.colliderect(true_haz)
 
-    if collide1:
-        score += 1
-        projectile_left = False
-    if collide2:
-        score += 1
-        projectile_right = False
-    if collide3:
-        score += 1
-        projectile_top = False
-    if collide4:
-        score += 1
-        projectile_bottom = False
+        if collide1:
+            score += 1
+            projectile_left = False
+        if collide2:
+            score += 1
+            projectile_right = False
+        if collide3:
+            score += 1
+            projectile_top = False
+        if collide4:
+            score += 1
+            projectile_bottom = False
 
-    if 60 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
-        SCORES.append(score)
-        SCORES.sort()
-        reset_game()
-        game_over()   
+        if 60 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
+            SCORES.append(score)
+            SCORES.sort()
+            reset_game()
+            game_over()   
+    else:
+        global player1_alive, player2_alive
+        player1 = None
+        player2 = None
+        if player1_alive:
+            player1 = pg.draw.circle(screen, "red", player1_pos, 40)
+        if player2_alive:
+            player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
+        handle_movement(None, player1, player2)
+        
+        haz_l, haz_r, haz_t, haz_b = generate_hazards_classic()
+        true_haz = generate_collect_mode_hazard()
+        # Player 1 Collisions
+        if player1_alive:
+            collide1_p1 = player1.colliderect(haz_l)
+            collide2_p1 = player1.colliderect(haz_r)
+            collide3_p1 = player1.colliderect(haz_t)
+            collide4_p1 = player1.colliderect(haz_b)
+            collide_haz_p1 = player1.colliderect(true_haz)
+        # Player 2 Collisions
+        if player2_alive:
+            collide1_p2 = player2.colliderect(haz_l)
+            collide2_p2 = player2.colliderect(haz_r)
+            collide3_p2 = player2.colliderect(haz_t)
+            collide4_p2 = player2.colliderect(haz_b)
+            collide_haz_p2 = player2.colliderect(true_haz)
+
+        # Handle Death Collisions Depending on the Game Mode
+        if NUM_PLAYERS == "2-Player":
+            if player1_alive and collide1_p1 or player2_alive and collide1_p2:
+                score += 1
+                projectile_left = False
+            if player1_alive and collide2_p1 or player2_alive and collide2_p2:
+                score += 1
+                projectile_right = False
+            if player1_alive and collide3_p1 or player2_alive and collide3_p2:
+                score += 1
+                projectile_top = False
+            if player1_alive and collide4_p1 or player2_alive and collide4_p2:
+                score += 1
+                projectile_bottom = False
+            if player1_alive and collide_haz_p1 != 0:
+                player1_alive = False
+            if player2_alive and collide_haz_p2 != 0:
+                player2_alive = False
+            if not (player1_alive or player2_alive):
+                SCORES.append(score)
+                SCORES.sort()
+                reset_game()
+                game_over()
+    
+        pass
 
 ###################################################################################################################
 # GAME LOOP
@@ -331,7 +384,7 @@ def play():
 
         if GAMEMODE == "Classic":
             classic_mode()
-        elif GAMEMODE == "Collect":
+        if GAMEMODE == "Collect":
             collect_mode(start_time)
             
         # Handle scores
