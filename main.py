@@ -169,45 +169,54 @@ def generate_collect_mode_hazard():
 
     if collect_projectile == False and collect_projectile_axis == 1:
         projectile_pos = (0,random.randint(0, HEIGHT))
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         collect_projectile = True
     elif collect_projectile == True and collect_projectile_axis == 1:
         projectile_pos = (projectile_pos[0] + projectile_X_init_speed, projectile_pos[1])
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         if projectile_pos[0] > WIDTH:
             collect_projectile = False
     
     if collect_projectile == False and collect_projectile_axis == 2:
         projectile_pos = (WIDTH,random.randint(0, HEIGHT))
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         collect_projectile = True
     elif collect_projectile == True and collect_projectile_axis == 2:
         projectile_pos = (projectile_pos[0] - projectile_X_init_speed, projectile_pos[1])
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         if projectile_pos[0] < 0:
             collect_projectile = False
 
     if collect_projectile == False and collect_projectile_axis == 3:
         projectile_pos = (random.randint(0, WIDTH),0)
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         collect_projectile = True
     elif collect_projectile == True and collect_projectile_axis == 3:
         projectile_pos = (projectile_pos[0], projectile_pos[1]+projectile_Y_init_speed)
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         if projectile_pos[1] > HEIGHT:
             collect_projectile = False
 
     if collect_projectile == False and collect_projectile_axis == 4:
         projectile_pos = (random.randint(0, WIDTH),HEIGHT)
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         collect_projectile = True
     elif collect_projectile == True and collect_projectile_axis == 4:
         projectile_pos = (projectile_pos[0], projectile_pos[1]-projectile_Y_init_speed)
-        projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        # projectile_circle = pg.draw.circle(screen, "black", projectile_pos, projectile_radius)
+        projectile_square = pg.draw.rect(screen, "black", pg.Rect(projectile_pos[0], projectile_pos[1], projectile_radius * 2.2, projectile_radius * 2.2))
         if projectile_pos[1] < 0:
             collect_projectile = False
     
-    return projectile_circle
+    # return projectile_circle
+    return projectile_square
 
 def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile
