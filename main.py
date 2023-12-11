@@ -20,6 +20,12 @@ player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 score = 0
 SCORES = [0,0,0,0,0]
+CLASSIC_OP_SCORES = [0,0,0,0,0]
+CLASSIC_TP_SCORES = [0,0,0,0,0]
+CLASSIC_VS_SCORES = [0,0,0,0,0]
+COLLECT_OP_SCORES = [0,0,0,0,0]
+COLLECT_TP_SCORES = [0,0,0,0,0]
+COLLECT_VS_SCORES = [0,0,0,0,0]
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
 GAMEMODE = "Classic"
@@ -232,6 +238,7 @@ def reset_game():
     score = 0
 
 def classic_mode():
+    global CLASSIC_OP_SCORES, CLASSIC_TP_SCORES, CLASSIC_VS_SCORES
     if NUM_PLAYERS == "1-Player":
         player = pg.draw.circle(screen, "red", player_pos, 40)
         handle_movement(player)
@@ -241,8 +248,8 @@ def classic_mode():
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
-            SCORES.append(score)
-            SCORES.sort()
+            CLASSIC_OP_SCORES.append(score)
+            CLASSIC_OP_SCORES.sort()
             reset_game()
             game_over()
     else:
@@ -268,21 +275,27 @@ def classic_mode():
             if player2_alive and collide_player2 != -1:
                 player2_alive = False
             if not (player1_alive or player2_alive):
-                SCORES.append(score)
-                SCORES.sort()
+                CLASSIC_TP_SCORES.append(score)
+                CLASSIC_TP_SCORES.sort()
                 reset_game()
                 game_over()
         elif NUM_PLAYERS == "VS":
             if collide_player1 != -1 and collide_player2 == -1:
+                CLASSIC_VS_SCORES.append(score)
+                CLASSIC_VS_SCORES.sort()
                 player_win(2)
             if collide_player1 == -1 and collide_player2 != -1:
+                CLASSIC_VS_SCORES.append(score)
+                CLASSIC_VS_SCORES.sort()
                 player_win(1)
             if collide_player1 != -1 and collide_player2 != -1:
+                CLASSIC_VS_SCORES.append(score)
+                CLASSIC_VS_SCORES.sort()
                 player_win(-1)
 
 
 def collect_mode(start_time):
-    global score, projectile_left, projectile_right, projectile_top, projectile_bottom
+    global score, projectile_left, projectile_right, projectile_top, projectile_bottom, COLLECT_OP_SCORES, COLLECT_TP_SCORES, COLLECT_VS_SCORES
 
     # Timer to the screen
     timer = font.render("{0}".format((30000 + start_time - pg.time.get_ticks())//1000), True, "black")
@@ -316,8 +329,8 @@ def collect_mode(start_time):
             projectile_bottom = False
 
         if 30 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
-            SCORES.append(score)
-            SCORES.sort()
+            COLLECT_OP_SCORES.append(score)
+            COLLECT_OP_SCORES.sort()
             reset_game()
             game_over()   
     else:
@@ -366,8 +379,8 @@ def collect_mode(start_time):
             if player2_alive and collide_haz_p2 != 0:
                 player2_alive = False
             if not (player1_alive or player2_alive) or (30 + (start_time - pg.time.get_ticks())//1000 == 0):
-                SCORES.append(score)
-                SCORES.sort()
+                COLLECT_TP_SCORES.append(score)
+                COLLECT_TP_SCORES.sort()
                 reset_game()
                 game_over()
         if NUM_PLAYERS == "VS":
@@ -407,9 +420,15 @@ def collect_mode(start_time):
             if 30 + (start_time - pg.time.get_ticks())//1000 == 0:
                 if score_p1_collide > score_p2_collide:
                     player_win(1)
+                    COLLECT_VS_SCORES.append(score_p1_collide)
+                    COLLECT_VS_SCORES.sort()
                 if score_p1_collide < score_p2_collide:
                     player_win(2)
+                    COLLECT_VS_SCORES.append(score_p2_collide)
+                    COLLECT_VS_SCORES.sort()
                 else:
+                    COLLECT_VS_SCORES.append(score_p1_collide)
+                    COLLECT_VS_SCORES.sort()
                     player_win(-1)
 
 ###################################################################################################################
@@ -581,6 +600,13 @@ def player_win(player_num):
 
 def scores(return_menu_type):
     pg.display.set_caption("Scores")
+    global SCORES
+    print("Classic op: ", CLASSIC_OP_SCORES)
+    print("Classic tp: ", CLASSIC_TP_SCORES)
+    print("Classic vs: ", CLASSIC_VS_SCORES)
+    print("Collect op: ", COLLECT_OP_SCORES)
+    print("COLLECT tp: ", COLLECT_TP_SCORES)
+    print("COLLECT vs: ", COLLECT_VS_SCORES)
     while True:
         screen.fill("grey")
         MOUSE_POS = pg.mouse.get_pos()
@@ -592,6 +618,21 @@ def scores(return_menu_type):
 
         RETURN_BTN.changeColor(MOUSE_POS)
         RETURN_BTN.update(screen)
+
+        if GAMEMODE == "Classic":
+            if NUM_PLAYERS == "1-Player":
+                SCORES = CLASSIC_OP_SCORES[:]
+            elif NUM_PLAYERS == "2-Player":
+                SCORES = CLASSIC_TP_SCORES[:]
+            else:
+                SCORES = CLASSIC_VS_SCORES[:]
+        elif GAMEMODE == "Collect":
+            if NUM_PLAYERS == "1-Player":
+                SCORES = COLLECT_OP_SCORES[:]
+            elif NUM_PLAYERS == "2-Player":
+                SCORES = COLLECT_TP_SCORES[:]
+            else:
+                SCORES = COLLECT_VS_SCORES[:]       
 
         score1 = font.render("1. {0}".format(SCORES[len(SCORES)-1]), True, "black")
         score2 = font.render("2. {0}".format(SCORES[len(SCORES)-2]), True, "black")
