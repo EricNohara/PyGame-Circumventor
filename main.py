@@ -285,7 +285,7 @@ def collect_mode(start_time):
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom
 
     # Timer to the screen
-    timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
+    timer = font.render("{0}".format((30000 + start_time - pg.time.get_ticks())//1000), True, "black")
     timer_rect = timer.get_rect()
     screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
 
@@ -315,7 +315,7 @@ def collect_mode(start_time):
             score += 1
             projectile_bottom = False
 
-        if 60 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
+        if 30 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
             SCORES.append(score)
             SCORES.sort()
             reset_game()
@@ -365,7 +365,7 @@ def collect_mode(start_time):
                 player1_alive = False
             if player2_alive and collide_haz_p2 != 0:
                 player2_alive = False
-            if not (player1_alive or player2_alive) or (60 + (start_time - pg.time.get_ticks())//1000 == 0):
+            if not (player1_alive or player2_alive) or (30 + (start_time - pg.time.get_ticks())//1000 == 0):
                 SCORES.append(score)
                 SCORES.sort()
                 reset_game()
@@ -404,7 +404,7 @@ def collect_mode(start_time):
             if collide_haz_p2 != 0:
                 score_p2_collide -= penalty
                 collect_projectile = False
-            if 60 + (start_time - pg.time.get_ticks())//1000 == 0:
+            if 30 + (start_time - pg.time.get_ticks())//1000 == 0:
                 if score_p1_collide > score_p2_collide:
                     player_win(1)
                 if score_p1_collide < score_p2_collide:
