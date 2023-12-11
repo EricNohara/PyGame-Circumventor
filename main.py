@@ -436,12 +436,16 @@ def play():
             
         # Handle scores for collect vs mode
         if GAMEMODE == "Collect" and NUM_PLAYERS == "VS":
-            score1 = font.render("Player 1 Score {0}".format(score_p1_collide), True, "black")
-            score2 = font.render("Player 2 Score {0}".format(score_p2_collide), True, "black")
-            score1_rect = score1.get_rect()
-            score2_rect = score2.get_rect()
-            screen.blit(score1, ((WIDTH - score1_rect.w)/4, 20))
-            screen.blit(score2, ((WIDTH - score2_rect.w)/1.25, 20))
+            player1_txt = font.render("Player 1:", True, "black")
+            player2_txt = font.render("Player 2:", True, "black")
+            score1 = font.render("{0}".format(score_p1_collide), True, "black")
+            score2 = font.render("{0}".format(score_p2_collide), True, "black")
+            player1_txt_rect = player1_txt.get_rect()
+            player2_txt_rect = player2_txt.get_rect()
+            screen.blit(player1_txt, ((WIDTH - player1_txt_rect.w)/4, 60))
+            screen.blit(player2_txt, ((WIDTH - player2_txt_rect.w)/1.25, 60))
+            screen.blit(score1, ((WIDTH/4)+10, 100))
+            screen.blit(score2, ((WIDTH/1.25)-10, 100))
         else:
             text = font.render("Score {0}".format(score), True, "black")
             text_rect = text.get_rect()
