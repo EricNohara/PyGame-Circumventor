@@ -28,8 +28,8 @@ GAMEMODE = "Classic"
 NUM_PLAYERS = "1-Player"
 player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
 player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
-player1_alive = True
-player2_alive = True
+player1_alive = player2_alive = True
+score_p1_collide = score_p2_collide = 0
 
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
@@ -213,7 +213,7 @@ def generate_collect_mode_hazard():
     return projectile_square
 
 def reset_game():
-    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     if NUM_PLAYERS == "1-Player":
         if GAMEMODE == "Collect":
@@ -222,6 +222,9 @@ def reset_game():
     else:
         if GAMEMODE == "Collect":
             collect_projectile = False
+            if NUM_PLAYERS == "VS":
+                score_p1_collide = 0
+                score_p2_collide = 0
         player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
         player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
         player1_alive = True
@@ -280,13 +283,15 @@ def classic_mode():
 
 def collect_mode(start_time):
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom
+
+    # Timer to the screen
+    timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
+    timer_rect = timer.get_rect()
+    screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
+
     if NUM_PLAYERS == "1-Player":
         player = pg.draw.circle(screen, "red", player_pos, 40)
         handle_movement(player)
-
-        timer = font.render("{0}".format((60000 + start_time - pg.time.get_ticks())//1000), True, "black")
-        timer_rect = timer.get_rect()
-        screen.blit(timer, ((WIDTH-timer_rect.w)/2, 100))
 
         # HAZARDS
         haz_l, haz_r, haz_t, haz_b = generate_hazards_classic()
@@ -360,13 +365,52 @@ def collect_mode(start_time):
                 player1_alive = False
             if player2_alive and collide_haz_p2 != 0:
                 player2_alive = False
-            if not (player1_alive or player2_alive):
+            if not (player1_alive or player2_alive) or (60 + (start_time - pg.time.get_ticks())//1000 == 0):
                 SCORES.append(score)
                 SCORES.sort()
                 reset_game()
                 game_over()
-    
-        pass
+        if NUM_PLAYERS == "VS":
+            global score_p1_collide, score_p2_collide, collect_projectile
+            penalty = 10 if DIFFICULTY_SETTING == "Medium" else 15 if DIFFICULTY_SETTING == "Hard" else 5
+            if player1_alive and collide1_p1:
+                score_p1_collide += 1
+                projectile_left = False
+            if player2_alive and collide1_p2:
+                score_p2_collide += 1
+                projectile_left = False
+            if player1_alive and collide2_p1:
+                score_p1_collide += 1
+                projectile_right = False
+            if player2_alive and collide2_p2:
+                score_p2_collide += 1
+                projectile_right = False
+            if player1_alive and collide3_p1:
+                score_p1_collide += 1
+                projectile_top = False
+            if player2_alive and collide3_p2:
+                score_p2_collide += 1
+                projectile_top = False
+            if player1_alive and collide4_p1:
+                score_p1_collide += 1
+                projectile_bottom = False
+            if player2_alive and collide4_p2:
+                score_p2_collide += 1
+                projectile_bottom = False
+
+            if collide_haz_p1 != 0:
+                score_p1_collide -= penalty
+                collect_projectile = False
+            if collide_haz_p2 != 0:
+                score_p2_collide -= penalty
+                collect_projectile = False
+            if 60 + (start_time - pg.time.get_ticks())//1000 == 0:
+                if score_p1_collide > score_p2_collide:
+                    player_win(1)
+                if score_p1_collide < score_p2_collide:
+                    player_win(2)
+                else:
+                    player_win(-1)
 
 ###################################################################################################################
 # GAME LOOP
@@ -374,7 +418,7 @@ def collect_mode(start_time):
 
 def play():
     start_time = pg.time.get_ticks()
-    global score
+    global score, score_p1_collide, score_p2_collide
     pg.display.set_caption("Play Game")
     while True:
         if GAMEMODE == "Classic":
@@ -390,10 +434,18 @@ def play():
         if GAMEMODE == "Collect":
             collect_mode(start_time)
             
-        # Handle scores
-        text = font.render("Score {0}".format(score), True, "black")
-        text_rect = text.get_rect()
-        screen.blit(text, ((WIDTH - text_rect.w)/2,20))
+        # Handle scores for collect vs mode
+        if GAMEMODE == "Collect" and NUM_PLAYERS == "VS":
+            score1 = font.render("Player 1 Score {0}".format(score_p1_collide), True, "black")
+            score2 = font.render("Player 2 Score {0}".format(score_p2_collide), True, "black")
+            score1_rect = score1.get_rect()
+            score2_rect = score2.get_rect()
+            screen.blit(score1, ((WIDTH - score1_rect.w)/4, 20))
+            screen.blit(score2, ((WIDTH - score2_rect.w)/1.25, 20))
+        else:
+            text = font.render("Score {0}".format(score), True, "black")
+            text_rect = text.get_rect()
+            screen.blit(text, ((WIDTH - text_rect.w)/2,20))
             
         # Display work on screen
         pg.display.flip()     
