@@ -10,6 +10,10 @@ CURRENT_SCREEN = "Main Menu"
 
 # Projectiles initial settings
 projectile_left = projectile_right = projectile_top = projectile_bottom = False
+projectile_left_pos = (0,0)
+projectile_right_pos = (WIDTH,0)
+projectile_top_pos = (0,0)
+projectile_bottom_pos = (0,HEIGHT)
 projectile_radius = 30
 projectile_X_init_speed = WIDTH/100
 projectile_Y_init_speed = HEIGHT/100
@@ -226,6 +230,7 @@ def generate_challenge_hazards():
     projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
     projectile_X_init_speed = WIDTH/100 if DIFFICULTY_SETTING == "Medium" else WIDTH/150 if DIFFICULTY_SETTING == "Easy" else WIDTH/75
     projectile_Y_init_speed = HEIGHT/100 if DIFFICULTY_SETTING == "Medium" else HEIGHT/150 if DIFFICULTY_SETTING == "Easy" else HEIGHT/75
+    circle_left = circle_right = circle_top = circle_bottom = None
     
     if projectile_left == False:
         projectile_left_pos = (0,player_pos.y)
@@ -236,18 +241,8 @@ def generate_challenge_hazards():
         circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
         if projectile_left_pos[0] > WIDTH:
             projectile_left = False
-    
-    if projectile_right == False:
-        projectile_right_pos = (WIDTH,player_pos.y)
-        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
-        projectile_right = True
-    elif projectile_right == True:
-        projectile_right_pos = (projectile_right_pos[0] - projectile_X_init_speed, projectile_right_pos[1])
-        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
-        if projectile_right_pos[0] < 0:
-            projectile_right = False
 
-    if projectile_top == False:
+    if projectile_top == False and projectile_left_pos[0] >= WIDTH/4:
         projectile_top_pos = (player_pos.x,0)
         circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
         projectile_top = True
@@ -257,7 +252,17 @@ def generate_challenge_hazards():
         if projectile_top_pos[1] > HEIGHT:
             projectile_top = False
 
-    if projectile_bottom == False:
+    if projectile_right == False and projectile_top_pos[1] >= WIDTH/4:
+        projectile_right_pos = (WIDTH,player_pos.y)
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        projectile_right = True
+    elif projectile_right == True:
+        projectile_right_pos = (projectile_right_pos[0] - projectile_X_init_speed, projectile_right_pos[1])
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        if projectile_right_pos[0] < 0:
+            projectile_right = False
+
+    if projectile_bottom == False and projectile_right_pos[0] <= (WIDTH - WIDTH/4):
         projectile_bottom_pos = (player_pos.x,HEIGHT)
         circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         projectile_bottom = True
@@ -266,16 +271,26 @@ def generate_challenge_hazards():
         circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
         if projectile_bottom_pos[1] < 0:
             projectile_bottom = False
+
+    hazards = []
+    for circle in [circle_left, circle_right, circle_top, circle_bottom]:
+        if circle != None:
+            hazards.append(circle)
     
-    return [circle_left, circle_right, circle_top, circle_bottom]
+    return hazards
 
 
 def reset_game():
-    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     if NUM_PLAYERS == "1-Player":
         if GAMEMODE == "Collect":
             collect_projectile = False
+        if GAMEMODE == "Challenge":
+            projectile_left_pos = (0,0) 
+            projectile_right_pos = (WIDTH,0) 
+            projectile_top_pos = (0,0)
+            projectile_bottom_pos = (0,HEIGHT)
         player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
     else:
         if GAMEMODE == "Collect":
