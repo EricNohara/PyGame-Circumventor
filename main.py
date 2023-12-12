@@ -221,6 +221,55 @@ def generate_collect_mode_hazard():
     
     return projectile_square
 
+def generate_challenge_hazards():
+    global projectile_left, projectile_right, projectile_top, projectile_bottom, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos, projectile_radius, projectile_X_init_speed, projectile_Y_init_speed
+    projectile_radius = 30 if DIFFICULTY_SETTING == "Medium" else 20 if DIFFICULTY_SETTING == "Easy" else 35
+    projectile_X_init_speed = WIDTH/100 if DIFFICULTY_SETTING == "Medium" else WIDTH/150 if DIFFICULTY_SETTING == "Easy" else WIDTH/75
+    projectile_Y_init_speed = HEIGHT/100 if DIFFICULTY_SETTING == "Medium" else HEIGHT/150 if DIFFICULTY_SETTING == "Easy" else HEIGHT/75
+    
+    if projectile_left == False:
+        projectile_left_pos = (0,player_pos.y)
+        circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
+        projectile_left = True
+    elif projectile_left == True:
+        projectile_left_pos = (projectile_left_pos[0] + projectile_X_init_speed, projectile_left_pos[1])
+        circle_left = pg.draw.circle(screen, "blue", projectile_left_pos, projectile_radius)
+        if projectile_left_pos[0] > WIDTH:
+            projectile_left = False
+    
+    if projectile_right == False:
+        projectile_right_pos = (WIDTH,player_pos.y)
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        projectile_right = True
+    elif projectile_right == True:
+        projectile_right_pos = (projectile_right_pos[0] - projectile_X_init_speed, projectile_right_pos[1])
+        circle_right = pg.draw.circle(screen, "blue", projectile_right_pos, projectile_radius)
+        if projectile_right_pos[0] < 0:
+            projectile_right = False
+
+    if projectile_top == False:
+        projectile_top_pos = (player_pos.x,0)
+        circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
+        projectile_top = True
+    elif projectile_top == True:
+        projectile_top_pos = (projectile_top_pos[0], projectile_top_pos[1]+projectile_Y_init_speed)
+        circle_top = pg.draw.circle(screen, "dark blue", projectile_top_pos, projectile_radius)
+        if projectile_top_pos[1] > HEIGHT:
+            projectile_top = False
+
+    if projectile_bottom == False:
+        projectile_bottom_pos = (player_pos.x,HEIGHT)
+        circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
+        projectile_bottom = True
+    elif projectile_bottom == True:
+        projectile_bottom_pos = (projectile_bottom_pos[0], projectile_bottom_pos[1]-projectile_Y_init_speed)
+        circle_bottom = pg.draw.circle(screen, "dark blue", projectile_bottom_pos, projectile_radius)
+        if projectile_bottom_pos[1] < 0:
+            projectile_bottom = False
+    
+    return [circle_left, circle_right, circle_top, circle_bottom]
+
+
 def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
@@ -295,7 +344,6 @@ def classic_mode():
                 CLASSIC_VS_SCORES.append(score)
                 CLASSIC_VS_SCORES.sort()
                 player_win(-1)
-
 
 def collect_mode(start_time):
     global score, projectile_left, projectile_right, projectile_top, projectile_bottom, COLLECT_OP_SCORES, COLLECT_TP_SCORES, COLLECT_VS_SCORES
@@ -436,6 +484,24 @@ def collect_mode(start_time):
 
 def challenge_mode():
     global CHALLENGE_OP_SCORES, CHALLENGE_TP_SCORES, CHALLENGE_VS_SCORES
+    if NUM_PLAYERS == "1-Player":
+        player = pg.draw.circle(screen, "red", player_pos, 40)
+        handle_movement(player)
+
+        # HAZARDS
+        hazards = generate_challenge_hazards()
+        collide = player.collidelist(hazards)
+
+        if not (collide == -1):
+            CLASSIC_OP_SCORES.append(score)
+            CLASSIC_OP_SCORES.sort()
+            reset_game()
+            game_over()
+    else:
+        if NUM_PLAYERS == "2-Player":
+            pass
+        else:
+            pass
     pass
 
 ###################################################################################################################
