@@ -561,7 +561,6 @@ def challenge_mode():
                 CHALLENGE_VS_SCORES.append(score)
                 CHALLENGE_VS_SCORES.sort()
                 player_win(-1)
-    pass
 
 ###################################################################################################################
 # GAME LOOP
@@ -760,7 +759,14 @@ def scores(return_menu_type):
             elif NUM_PLAYERS == "2-Player":
                 SCORES = COLLECT_TP_SCORES[:]
             else:
-                SCORES = COLLECT_VS_SCORES[:]       
+                SCORES = COLLECT_VS_SCORES[:]
+        else:
+            if NUM_PLAYERS == "1-Player":
+                SCORES = CHALLENGE_OP_SCORES[:]  
+            elif NUM_PLAYERS == "2-Player":
+                SCORES = CHALLENGE_TP_SCORES[:]
+            else:
+                SCORES = CHALLENGE_VS_SCORES[:]     
 
         score1 = font.render("1. {0}".format(SCORES[len(SCORES)-1]), True, "black")
         score2 = font.render("2. {0}".format(SCORES[len(SCORES)-2]), True, "black")
