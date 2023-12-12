@@ -3,6 +3,7 @@ from button import Button
 
 pg.init()
 
+# SCREEN SETTINGS
 SIZE = (WIDTH, HEIGHT) = (1280, 720)
 screen = pg.display.set_mode(SIZE)
 clock = pg.time.Clock()     #set the clock to the pygame clock
@@ -22,6 +23,7 @@ collect_projectile_axis = 1
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
+# SCORE STARE VARIABLES
 score = 0
 SCORES = [0,0,0,0,0]
 CLASSIC_OP_SCORES = [0,0,0,0,0]
@@ -33,17 +35,20 @@ COLLECT_VS_SCORES = [0,0,0,0,0]
 CHALLENGE_OP_SCORES = [0,0,0,0,0]
 CHALLENGE_TP_SCORES = [0,0,0,0,0]
 CHALLENGE_VS_SCORES = [0,0,0,0,0]
+
+# GAME SETTINGS
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
 GAMEMODE = "Classic"
+NUM_PLAYERS = "1-Player"
 
 # For 2 player mode
-NUM_PLAYERS = "1-Player"
 player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
 player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
 player1_alive = player2_alive = True
 score_p1_collide = score_p2_collide = 0
 
+# FONTS
 font = pg.font.Font('freesansbold.ttf', 30)
 header_font = pg.font.Font('freesansbold.ttf', 60)
 
@@ -298,6 +303,11 @@ def reset_game():
             if NUM_PLAYERS == "VS":
                 score_p1_collide = 0
                 score_p2_collide = 0
+        if GAMEMODE == "Challenge":
+            projectile_left_pos = (0,0) 
+            projectile_right_pos = (WIDTH,0) 
+            projectile_top_pos = (0,0)
+            projectile_bottom_pos = (0,HEIGHT)
         player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
         player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
         player1_alive = True
@@ -503,20 +513,54 @@ def challenge_mode():
         player = pg.draw.circle(screen, "red", player_pos, 40)
         handle_movement(player)
 
-        # HAZARDS
         hazards = generate_challenge_hazards()
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
-            CLASSIC_OP_SCORES.append(score)
-            CLASSIC_OP_SCORES.sort()
+            CHALLENGE_OP_SCORES.append(score)
+            CHALLENGE_OP_SCORES.sort()
             reset_game()
             game_over()
     else:
+        global player1_alive, player2_alive
+        player1 = None
+        player2 = None
+        if player1_alive:
+            player1 = pg.draw.circle(screen, "red", player1_pos, 40)
+        if player2_alive:
+            player2 = pg.draw.circle(screen, "orange", player2_pos, 40)
+        handle_movement(None, player1, player2)
+        
+        hazards = generate_hazards_classic()
+
+        if player1_alive:
+            collide_player1 = player1.collidelist(hazards)
+        if player2_alive:
+            collide_player2 = player2.collidelist(hazards)
+
         if NUM_PLAYERS == "2-Player":
-            pass
-        else:
-            pass
+            if player1_alive and collide_player1 != -1:
+                player1_alive = False
+            if player2_alive and collide_player2 != -1:
+                player2_alive = False
+            if not (player1_alive or player2_alive):
+                CHALLENGE_TP_SCORES.append(score)
+                CHALLENGE_TP_SCORES.sort()
+                reset_game()
+                game_over()
+        elif NUM_PLAYERS == "VS":
+            if collide_player1 != -1 and collide_player2 == -1:
+                CHALLENGE_VS_SCORES.append(score)
+                CHALLENGE_VS_SCORES.sort()
+                player_win(2)
+            if collide_player1 == -1 and collide_player2 != -1:
+                CHALLENGE_VS_SCORES.append(score)
+                CHALLENGE_VS_SCORES.sort()
+                player_win(1)
+            if collide_player1 != -1 and collide_player2 != -1:
+                CHALLENGE_VS_SCORES.append(score)
+                CHALLENGE_VS_SCORES.sort()
+                player_win(-1)
     pass
 
 ###################################################################################################################
