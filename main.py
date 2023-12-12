@@ -737,36 +737,45 @@ def scores(return_menu_type):
     while True:
         screen.fill("grey")
         MOUSE_POS = pg.mouse.get_pos()
-        header = header_font.render("Scores", True, "black")
-        header_rect = header.get_rect()
-        screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8))
-
+        
         RETURN_BTN = Button(image=pg.image.load("assets/Btn-Rect2.png"), pos=(WIDTH/2, HEIGHT/1.2), text_input="RETURN", font=font, base_color="grey", hovering_color="white")
-
         RETURN_BTN.changeColor(MOUSE_POS)
         RETURN_BTN.update(screen)
 
         if GAMEMODE == "Classic":
             if NUM_PLAYERS == "1-Player":
                 SCORES = CLASSIC_OP_SCORES[:]
+                title = "CLASSIC 1-PLAYER SCORES:"
             elif NUM_PLAYERS == "2-Player":
                 SCORES = CLASSIC_TP_SCORES[:]
+                title = "CLASSIC 2-PLAYER SCORES:"
             else:
                 SCORES = CLASSIC_VS_SCORES[:]
+                title = "CLASSIC VS SCORES:"
         elif GAMEMODE == "Collect":
             if NUM_PLAYERS == "1-Player":
                 SCORES = COLLECT_OP_SCORES[:]
+                title = "COLLECT 1-PLAYER SCORES:"
             elif NUM_PLAYERS == "2-Player":
                 SCORES = COLLECT_TP_SCORES[:]
+                title = "COLLECT 2-PLAYER SCORES:"
             else:
                 SCORES = COLLECT_VS_SCORES[:]
+                title = "COLLECT VS SCORES:"
         else:
             if NUM_PLAYERS == "1-Player":
                 SCORES = CHALLENGE_OP_SCORES[:]  
+                title = "CHALLENGE 1-PLAYER SCORES:"
             elif NUM_PLAYERS == "2-Player":
                 SCORES = CHALLENGE_TP_SCORES[:]
+                title = "CHALLENGE 2-PLAYER SCORES:"
             else:
-                SCORES = CHALLENGE_VS_SCORES[:]     
+                SCORES = CHALLENGE_VS_SCORES[:]  
+                title = "CHALLENGE VS SCORES:"  
+
+        header = header_font.render(title, True, "black")
+        header_rect = header.get_rect()
+        screen.blit(header, ((WIDTH-header_rect.w)/2,(HEIGHT-header_rect.h)/8)) 
 
         score1 = font.render("1. {0}".format(SCORES[len(SCORES)-1]), True, "black")
         score2 = font.render("2. {0}".format(SCORES[len(SCORES)-2]), True, "black")
