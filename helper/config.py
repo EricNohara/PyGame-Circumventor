@@ -1,6 +1,5 @@
 import pygame as pg
-from myconstants import *
-
+from helper.myconstants import *
 pg.init()
 
 # PROJECTILE INITIAL SETTINGS

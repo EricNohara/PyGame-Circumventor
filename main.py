@@ -1,28 +1,14 @@
 import random, pygame as pg, sys
-from button import Button
-from myconstants import *
-from config import *
+from helper.button import Button
+from helper.myconstants import *
+from helper.config import *
+from helper.exit import *
 
 pg.init()
 
 ###################################################################################################################
 # HELPER FUNCTIONS
-###################################################################################################################
-
-def check_exit_pygame_menu(event):
-    if event.type == pg.QUIT:
-        pg.quit()
-        sys.exit()
-    elif event.type == pg.KEYDOWN:
-        if event.key == pg.K_ESCAPE:
-            pg.quit()
-            sys.exit()   
-
-def check_exit(event):
-    if event.type == pg.QUIT:
-        pg.quit()
-        sys.exit()
-            
+###################################################################################################################            
 def handle_movement(player = None, player1 = None, player2 = None):
     keys = pg.key.get_pressed()
 
@@ -519,9 +505,10 @@ def challenge_mode():
 ###################################################################################################################
 
 def play():
-    start_time = pg.time.get_ticks()
     global score, score_p1_collide, score_p2_collide
+    start_time = pg.time.get_ticks()
     pg.display.set_caption("Play Game")
+
     while True:
         if GAMEMODE == "Classic" or GAMEMODE == "Challenge":
             score = (pg.time.get_ticks() - start_time) // 1000
@@ -558,7 +545,7 @@ def play():
         # Display work on screen
         pg.display.flip()     
         clock.tick(60)
- 
+
 def settings(return_menu_type):
     global MUTED, DIFFICULTY_SETTING, NUM_PLAYERS, GAMEMODE
     pg.display.set_caption("Settings")
@@ -606,40 +593,40 @@ def settings(return_menu_type):
             btn.changeColor(MOUSE_POS)
             btn.update(screen)
 
-        for event in pg.event.get():
-            check_exit(event)
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
-                    menu_screen(return_menu_type)
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                if RETURN_BTN.checkForInput(MOUSE_POS):
-                    menu_screen(return_menu_type)
-                if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
-                    if NUM_PLAYERS == "1-Player":
-                        NUM_PLAYERS = "2-Player"
-                    elif NUM_PLAYERS == "2-Player":
-                        NUM_PLAYERS = "VS"
-                    else:
-                        NUM_PLAYERS = "1-Player"
-                if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
-                    if DIFFICULTY_SETTING == "Medium":
-                        DIFFICULTY_SETTING = "Hard"
-                    elif DIFFICULTY_SETTING == "Hard":
-                        DIFFICULTY_SETTING = "Easy"
-                    else:
-                        DIFFICULTY_SETTING = "Medium"
-                if MUTE_BTN.checkForInput(MOUSE_POS):
-                    if MUTED == False:
-                        MUTED = True
-                    else:
-                        MUTED = False
-                if GAMEMODE_BTN.checkForInput(MOUSE_POS):
-                    if GAMEMODE == "Classic":
-                        GAMEMODE = "Collect"
-                    elif GAMEMODE == "Collect":
-                        GAMEMODE = "Challenge"
-                    else:
-                        GAMEMODE = "Classic"
+            for event in pg.event.get():
+                check_exit(event)
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
+                        menu_screen(return_menu_type)
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if RETURN_BTN.checkForInput(MOUSE_POS):
+                        menu_screen(return_menu_type)
+                    if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
+                        if NUM_PLAYERS == "1-Player":
+                            NUM_PLAYERS = "2-Player"
+                        elif NUM_PLAYERS == "2-Player":
+                            NUM_PLAYERS = "VS"
+                        else:
+                            NUM_PLAYERS = "1-Player"
+                    if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
+                        if DIFFICULTY_SETTING == "Medium":
+                            DIFFICULTY_SETTING = "Hard"
+                        elif DIFFICULTY_SETTING == "Hard":
+                            DIFFICULTY_SETTING = "Easy"
+                        else:
+                            DIFFICULTY_SETTING = "Medium"
+                    if MUTE_BTN.checkForInput(MOUSE_POS):
+                        if MUTED == False:
+                            MUTED = True
+                        else:
+                            MUTED = False
+                    if GAMEMODE_BTN.checkForInput(MOUSE_POS):
+                        if GAMEMODE == "Classic":
+                            GAMEMODE = "Collect"
+                        elif GAMEMODE == "Collect":
+                            GAMEMODE = "Challenge"
+                        else:
+                            GAMEMODE = "Classic"
 
         pg.display.flip()
 
