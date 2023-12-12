@@ -26,6 +26,9 @@ CLASSIC_VS_SCORES = [0,0,0,0,0]
 COLLECT_OP_SCORES = [0,0,0,0,0]
 COLLECT_TP_SCORES = [0,0,0,0,0]
 COLLECT_VS_SCORES = [0,0,0,0,0]
+CHALLENGE_OP_SCORES = [0,0,0,0,0]
+CHALLENGE_TP_SCORES = [0,0,0,0,0]
+CHALLENGE_VS_SCORES = [0,0,0,0,0]
 MUTED = False
 DIFFICULTY_SETTING = "Medium"
 GAMEMODE = "Classic"
@@ -431,6 +434,10 @@ def collect_mode(start_time):
                     COLLECT_VS_SCORES.sort()
                     player_win(-1)
 
+def challenge_mode():
+    global CHALLENGE_OP_SCORES, CHALLENGE_TP_SCORES, CHALLENGE_VS_SCORES
+    pass
+
 ###################################################################################################################
 # GAME LOOP
 ###################################################################################################################
@@ -440,7 +447,7 @@ def play():
     global score, score_p1_collide, score_p2_collide
     pg.display.set_caption("Play Game")
     while True:
-        if GAMEMODE == "Classic":
+        if GAMEMODE == "Classic" or GAMEMODE == "Challenge":
             score = (pg.time.get_ticks() - start_time) // 1000
         
         for event in pg.event.get():
@@ -452,6 +459,8 @@ def play():
             classic_mode()
         if GAMEMODE == "Collect":
             collect_mode(start_time)
+        if GAMEMODE == "Challenge":
+            challenge_mode()
             
         # Handle scores for collect vs mode
         if GAMEMODE == "Collect" and NUM_PLAYERS == "VS":
@@ -469,7 +478,7 @@ def play():
             text = font.render("Score {0}".format(score), True, "black")
             text_rect = text.get_rect()
             screen.blit(text, ((WIDTH - text_rect.w)/2,20))
-            
+
         # Display work on screen
         pg.display.flip()     
         clock.tick(60)
@@ -601,12 +610,6 @@ def player_win(player_num):
 def scores(return_menu_type):
     pg.display.set_caption("Scores")
     global SCORES
-    print("Classic op: ", CLASSIC_OP_SCORES)
-    print("Classic tp: ", CLASSIC_TP_SCORES)
-    print("Classic vs: ", CLASSIC_VS_SCORES)
-    print("Collect op: ", COLLECT_OP_SCORES)
-    print("COLLECT tp: ", COLLECT_TP_SCORES)
-    print("COLLECT vs: ", COLLECT_VS_SCORES)
     while True:
         screen.fill("grey")
         MOUSE_POS = pg.mouse.get_pos()
