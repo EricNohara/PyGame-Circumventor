@@ -1,56 +1,9 @@
 import random, pygame as pg, sys
 from button import Button
+from myconstants import *
+from config import *
 
 pg.init()
-
-# SCREEN SETTINGS
-SIZE = (WIDTH, HEIGHT) = (1280, 720)
-screen = pg.display.set_mode(SIZE)
-clock = pg.time.Clock()     #set the clock to the pygame clock
-CURRENT_SCREEN = "Main Menu"
-
-# Projectiles initial settings
-projectile_left = projectile_right = projectile_top = projectile_bottom = False
-projectile_left_pos = (0,0)
-projectile_right_pos = (WIDTH,0)
-projectile_top_pos = (0,0)
-projectile_bottom_pos = (0,HEIGHT)
-projectile_radius = 30
-projectile_X_init_speed = WIDTH/100
-projectile_Y_init_speed = HEIGHT/100
-collect_projectile = False
-collect_projectile_axis = 1
-
-player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
-
-# SCORE STARE VARIABLES
-score = 0
-SCORES = [0,0,0,0,0]
-CLASSIC_OP_SCORES = [0,0,0,0,0]
-CLASSIC_TP_SCORES = [0,0,0,0,0]
-CLASSIC_VS_SCORES = [0,0,0,0,0]
-COLLECT_OP_SCORES = [0,0,0,0,0]
-COLLECT_TP_SCORES = [0,0,0,0,0]
-COLLECT_VS_SCORES = [0,0,0,0,0]
-CHALLENGE_OP_SCORES = [0,0,0,0,0]
-CHALLENGE_TP_SCORES = [0,0,0,0,0]
-CHALLENGE_VS_SCORES = [0,0,0,0,0]
-
-# GAME SETTINGS
-MUTED = False
-DIFFICULTY_SETTING = "Medium"
-GAMEMODE = "Classic"
-NUM_PLAYERS = "1-Player"
-
-# For 2 player mode
-player1_pos = pg.Vector2(WIDTH/3, HEIGHT/2)
-player2_pos = pg.Vector2(WIDTH/1.5, HEIGHT/2)
-player1_alive = player2_alive = True
-score_p1_collide = score_p2_collide = 0
-
-# FONTS
-font = pg.font.Font('freesansbold.ttf', 30)
-header_font = pg.font.Font('freesansbold.ttf', 60)
 
 ###################################################################################################################
 # HELPER FUNCTIONS
@@ -283,7 +236,6 @@ def generate_challenge_hazards():
             hazards.append(circle)
     
     return hazards
-
 
 def reset_game():
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos
