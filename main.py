@@ -653,6 +653,10 @@ def settings(return_menu_type):
 
 def player_win(player_num):
     pg.display.set_caption("Win Screen")
+    if player_num != -1:
+        win_sound.play()
+    else:
+        tie_sound.play()
     while True:
         MOUSE_POS = pg.mouse.get_pos()
         reset_game()
@@ -680,6 +684,7 @@ def player_win(player_num):
             check_exit(event)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
+                    pg.mixer.stop()
                     play()
                 if event.key == pg.K_ESCAPE:
                     main_menu()
