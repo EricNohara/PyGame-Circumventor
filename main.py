@@ -338,15 +338,19 @@ def collect_mode(start_time):
         collide_haz = player.colliderect(true_haz)
 
         if collide1:
+            collect_sound.play()
             score += 1
             projectile_left = False
         if collide2:
+            collect_sound.play()
             score += 1
             projectile_right = False
         if collide3:
+            collect_sound.play()
             score += 1
             projectile_top = False
         if collide4:
+            collect_sound.play()
             score += 1
             projectile_bottom = False
 
@@ -387,15 +391,19 @@ def collect_mode(start_time):
         # Handle Death Collisions Depending on the Game Mode
         if NUM_PLAYERS == "2-Player":
             if player1_alive and collide1_p1 or player2_alive and collide1_p2:
+                collect_sound.play()
                 score += 1
                 projectile_left = False
             if player1_alive and collide2_p1 or player2_alive and collide2_p2:
+                collect_sound.play()
                 score += 1
                 projectile_right = False
             if player1_alive and collide3_p1 or player2_alive and collide3_p2:
+                collect_sound.play()
                 score += 1
                 projectile_top = False
             if player1_alive and collide4_p1 or player2_alive and collide4_p2:
+                collect_sound.play()
                 score += 1
                 projectile_bottom = False
             if player1_alive and collide_haz_p1 != 0:
@@ -413,49 +421,56 @@ def collect_mode(start_time):
             global score_p1_collide, score_p2_collide, collect_projectile
             penalty = 10 if DIFFICULTY_SETTING == "Medium" else 15 if DIFFICULTY_SETTING == "Hard" else 5
             if player1_alive and collide1_p1:
+                collect_sound.play()
                 score_p1_collide += 1
                 projectile_left = False
             if player2_alive and collide1_p2:
+                collect_sound.play()
                 score_p2_collide += 1
                 projectile_left = False
             if player1_alive and collide2_p1:
+                collect_sound.play()
                 score_p1_collide += 1
                 projectile_right = False
             if player2_alive and collide2_p2:
+                collect_sound.play()
                 score_p2_collide += 1
                 projectile_right = False
             if player1_alive and collide3_p1:
+                collect_sound.play()
                 score_p1_collide += 1
                 projectile_top = False
             if player2_alive and collide3_p2:
+                collect_sound.play()
                 score_p2_collide += 1
                 projectile_top = False
             if player1_alive and collide4_p1:
+                collect_sound.play()
                 score_p1_collide += 1
                 projectile_bottom = False
             if player2_alive and collide4_p2:
+                collect_sound.play()
                 score_p2_collide += 1
                 projectile_bottom = False
 
             if collide_haz_p1 != 0:
+                player_death.play()
                 score_p1_collide -= penalty
                 collect_projectile = False
             if collide_haz_p2 != 0:
+                player_death.play()
                 score_p2_collide -= penalty
                 collect_projectile = False
             if 30 + (start_time - pg.time.get_ticks())//1000 == 0:
                 if score_p1_collide > score_p2_collide:
-                    player_death.play()
                     player_win(1)
                     COLLECT_VS_SCORES.append(score_p1_collide)
                     COLLECT_VS_SCORES.sort()
                 if score_p1_collide < score_p2_collide:
-                    player_death.play()
                     player_win(2)
                     COLLECT_VS_SCORES.append(score_p2_collide)
                     COLLECT_VS_SCORES.sort()
                 else:
-                    player_death.play()
                     COLLECT_VS_SCORES.append(score_p1_collide)
                     COLLECT_VS_SCORES.sort()
                     player_win(-1)
@@ -614,40 +629,46 @@ def settings(return_menu_type):
             btn.changeColor(MOUSE_POS)
             btn.update(screen)
 
-            for event in pg.event.get():
-                check_exit(event)
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
-                        menu_screen(return_menu_type)
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    if RETURN_BTN.checkForInput(MOUSE_POS):
-                        menu_screen(return_menu_type)
-                    if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
-                        if NUM_PLAYERS == "1-Player":
-                            NUM_PLAYERS = "2-Player"
-                        elif NUM_PLAYERS == "2-Player":
-                            NUM_PLAYERS = "VS"
-                        else:
-                            NUM_PLAYERS = "1-Player"
-                    if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
-                        if DIFFICULTY_SETTING == "Medium":
-                            DIFFICULTY_SETTING = "Hard"
-                        elif DIFFICULTY_SETTING == "Hard":
-                            DIFFICULTY_SETTING = "Easy"
-                        else:
-                            DIFFICULTY_SETTING = "Medium"
-                    if MUTE_BTN.checkForInput(MOUSE_POS):
-                        if MUTED == False:
-                            MUTED = True
-                        else:
-                            MUTED = False
-                    if GAMEMODE_BTN.checkForInput(MOUSE_POS):
-                        if GAMEMODE == "Classic":
-                            GAMEMODE = "Collect"
-                        elif GAMEMODE == "Collect":
-                            GAMEMODE = "Challenge"
-                        else:
-                            GAMEMODE = "Classic"
+        for event in pg.event.get():
+            check_exit(event)
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE or event.key == pg.K_RETURN:
+                    click_sound.play()
+                    menu_screen(return_menu_type)
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                if RETURN_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
+                    menu_screen(return_menu_type)
+                if PLAYER_NUM_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
+                    if NUM_PLAYERS == "1-Player":
+                        NUM_PLAYERS = "2-Player"
+                    elif NUM_PLAYERS == "2-Player":
+                        NUM_PLAYERS = "VS"
+                    else:
+                        NUM_PLAYERS = "1-Player"
+                if DIFFICULTY_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
+                    if DIFFICULTY_SETTING == "Medium":
+                        DIFFICULTY_SETTING = "Hard"
+                    elif DIFFICULTY_SETTING == "Hard":
+                        DIFFICULTY_SETTING = "Easy"
+                    else:
+                        DIFFICULTY_SETTING = "Medium"
+                if MUTE_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
+                    if MUTED == False:
+                        MUTED = True
+                    else:
+                        MUTED = False
+                if GAMEMODE_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
+                    if GAMEMODE == "Classic":
+                        GAMEMODE = "Collect"
+                    elif GAMEMODE == "Collect":
+                        GAMEMODE = "Challenge"
+                    else:
+                        GAMEMODE = "Classic"
 
         pg.display.flip()
 
@@ -685,13 +706,18 @@ def player_win(player_num):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     pg.mixer.stop()
+                    click_sound.play()
                     play()
                 if event.key == pg.K_ESCAPE:
                     main_menu()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if PLAY_AGAIN_BTN.checkForInput(MOUSE_POS):
+                    pg.mixer.stop()
+                    click_sound.play()
                     play()
                 if MENU_BTN.checkForInput(MOUSE_POS):
+                    pg.mixer.stop()
+                    click_sound.play()
                     main_menu()
 
         pg.display.flip()
@@ -758,9 +784,11 @@ def scores(return_menu_type):
             check_exit(event)
             if event.type == pg.MOUSEBUTTONDOWN:
                 if RETURN_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
                     menu_screen(return_menu_type)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
+                    click_sound.play()
                     menu_screen(return_menu_type)
 
         pg.display.flip()
@@ -788,15 +816,20 @@ def menu_screen(menu_type):
             check_exit_pygame_menu(event)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
+                    click_sound.play()
                     play()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if PLAY_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
                     play()
                 if SETTINGS_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
                     settings(menu_type)
                 if SCORES_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
                     scores(menu_type)
                 if QUIT_BTN.checkForInput(MOUSE_POS):
+                    click_sound.play()
                     pg.quit()
                     sys.exit()
 
