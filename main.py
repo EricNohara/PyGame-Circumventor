@@ -543,7 +543,8 @@ def play():
     global score, score_p1_collide, score_p2_collide
     start_time = pg.time.get_ticks()
     pg.display.set_caption("Play Game")
-    play_music()
+    if not MUTED:
+        play_music()
 
     while True:
         if GAMEMODE == "Classic" or GAMEMODE == "Challenge":
