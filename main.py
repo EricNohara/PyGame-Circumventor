@@ -3,6 +3,7 @@ from helper.button import Button
 from helper.myconstants import *
 from helper.config import *
 from helper.exit import *
+from pygame import mixer
 
 pg.init()
 
@@ -224,6 +225,7 @@ def generate_challenge_hazards(cur_player_pos):
     return hazards
 
 def reset_game():
+    stop_music()
     global projectile_left, projectile_right, projectile_top, projectile_bottom, player_pos, score, player1_pos, player2_pos, player1_alive, player2_alive, collect_projectile, score_p1_collide, score_p2_collide, projectile_left_pos, projectile_right_pos, projectile_top_pos, projectile_bottom_pos
     projectile_left = projectile_right = projectile_top = projectile_bottom = False
     if NUM_PLAYERS == "1-Player":
@@ -263,6 +265,7 @@ def classic_mode():
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
+            player_death.play()
             CLASSIC_OP_SCORES.append(score)
             CLASSIC_OP_SCORES.sort()
             reset_game()
@@ -286,9 +289,11 @@ def classic_mode():
 
         if NUM_PLAYERS == "2-Player":
             if player1_alive and collide_player1 != -1:
+                player_death.play()
                 player1_alive = False
             if player2_alive and collide_player2 != -1:
                 player2_alive = False
+                player_death.play()
             if not (player1_alive or player2_alive):
                 CLASSIC_TP_SCORES.append(score)
                 CLASSIC_TP_SCORES.sort()
@@ -296,14 +301,17 @@ def classic_mode():
                 game_over()
         elif NUM_PLAYERS == "VS":
             if collide_player1 != -1 and collide_player2 == -1:
+                player_death.play()
                 CLASSIC_VS_SCORES.append(score)
                 CLASSIC_VS_SCORES.sort()
                 player_win(2)
             if collide_player1 == -1 and collide_player2 != -1:
+                player_death.play()
                 CLASSIC_VS_SCORES.append(score)
                 CLASSIC_VS_SCORES.sort()
                 player_win(1)
             if collide_player1 != -1 and collide_player2 != -1:
+                player_death.play()
                 CLASSIC_VS_SCORES.append(score)
                 CLASSIC_VS_SCORES.sort()
                 player_win(-1)
@@ -343,6 +351,8 @@ def collect_mode(start_time):
             projectile_bottom = False
 
         if 30 + (start_time - pg.time.get_ticks())//1000 == 0 or collide_haz:
+            if collide_haz:
+                player_death.play()
             COLLECT_OP_SCORES.append(score)
             COLLECT_OP_SCORES.sort()
             reset_game()
@@ -389,8 +399,10 @@ def collect_mode(start_time):
                 score += 1
                 projectile_bottom = False
             if player1_alive and collide_haz_p1 != 0:
+                player_death.play()
                 player1_alive = False
             if player2_alive and collide_haz_p2 != 0:
+                player_death.play()
                 player2_alive = False
             if not (player1_alive or player2_alive) or (30 + (start_time - pg.time.get_ticks())//1000 == 0):
                 COLLECT_TP_SCORES.append(score)
@@ -433,14 +445,17 @@ def collect_mode(start_time):
                 collect_projectile = False
             if 30 + (start_time - pg.time.get_ticks())//1000 == 0:
                 if score_p1_collide > score_p2_collide:
+                    player_death.play()
                     player_win(1)
                     COLLECT_VS_SCORES.append(score_p1_collide)
                     COLLECT_VS_SCORES.sort()
                 if score_p1_collide < score_p2_collide:
+                    player_death.play()
                     player_win(2)
                     COLLECT_VS_SCORES.append(score_p2_collide)
                     COLLECT_VS_SCORES.sort()
                 else:
+                    player_death.play()
                     COLLECT_VS_SCORES.append(score_p1_collide)
                     COLLECT_VS_SCORES.sort()
                     player_win(-1)
@@ -455,6 +470,7 @@ def challenge_mode():
         collide = player.collidelist(hazards)
 
         if not (collide == -1):
+            player_death.play()
             CHALLENGE_OP_SCORES.append(score)
             CHALLENGE_OP_SCORES.sort()
             reset_game()
@@ -474,20 +490,13 @@ def challenge_mode():
             collide_player2 = player2.collidelist(hazards)
 
         handle_movement(None, player1, player2)
-        
-        # if not player2_alive and player1_alive:
-        #     hazards = generate_challenge_hazards(player1_pos)
-        # hazards = generate_hazards_classic()
-
-        # if player1_alive:
-        #     collide_player1 = player1.collidelist(hazards)
-        # if player2_alive:
-        #     collide_player2 = player2.collidelist(hazards)
 
         if NUM_PLAYERS == "2-Player":
             if player1_alive and collide_player1 != -1:
+                player_death.play()
                 player1_alive = False
             if player2_alive and collide_player2 != -1:
+                player_death.play()
                 player2_alive = False
             if not (player1_alive or player2_alive):
                 CHALLENGE_TP_SCORES.append(score)
@@ -496,14 +505,17 @@ def challenge_mode():
                 game_over()
         elif NUM_PLAYERS == "VS":
             if collide_player1 != -1 and collide_player2 == -1:
+                player_death.play()
                 CHALLENGE_VS_SCORES.append(score)
                 CHALLENGE_VS_SCORES.sort()
                 player_win(2)
             if collide_player1 == -1 and collide_player2 != -1:
+                player_death.play()
                 CHALLENGE_VS_SCORES.append(score)
                 CHALLENGE_VS_SCORES.sort()
                 player_win(1)
             if collide_player1 != -1 and collide_player2 != -1:
+                player_death.play()
                 CHALLENGE_VS_SCORES.append(score)
                 CHALLENGE_VS_SCORES.sort()
                 player_win(-1)
@@ -516,6 +528,7 @@ def play():
     global score, score_p1_collide, score_p2_collide
     start_time = pg.time.get_ticks()
     pg.display.set_caption("Play Game")
+    play_music()
 
     while True:
         if GAMEMODE == "Classic" or GAMEMODE == "Challenge":
@@ -785,6 +798,7 @@ def menu_screen(menu_type):
         pg.display.flip()
 
 def game_over():
+    game_over_sound.play()
     menu_screen("Game Over")
 
 def main_menu():
