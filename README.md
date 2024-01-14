@@ -6,7 +6,7 @@ Game written in Python using PyGame library. Has a menu to toggle between diffic
 # Installation Guide:
 Clone this repository locally on the command line:
 
-git clone 
+git clone https://github.com/EricNohara/PyGame-Circumventor.git
 
 Run the main.py file.
  
